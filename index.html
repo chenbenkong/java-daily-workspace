@@ -1,200 +1,234 @@
-<!-- 本工作台通过 WorkBuddy 资料库能力（library skill）搭建、存储和部署 -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>Java 每日小灶 · 每天学一点</title>
+<title>Java 每日小灶 · 风趣易懂的 Java 工作台</title>
 <style>
   :root{
-    --bg:#f4f5f7; --card:#ffffff; --primary:#ea7a2e; --primary-d:#d9691c;
-    --accent:#0ea5e9; --text:#1f2937; --muted:#6b7280; --line:#e8e9ec;
-    --red:#ef4444; --green:#22c55e; --amber:#f59e0b; --soft:#fff7ef;
-    --shadow:0 1px 3px rgba(0,0,0,.06),0 6px 18px rgba(0,0,0,.05);
+    --cream:#f6efe4; --paper:#fffdf8; --ink:#43372c; --ink-soft:#6f6052;
+    --coffee:#b5651d; --coffee-d:#934f15; --tea:#2a9d8f; --tea-d:#1f7a6f;
+    --rose:#d98b6f; --gold:#e0a83c; --line:#e7dcc8; --red:#d1495b; --green:#3a9d6b;
+    --shadow:0 2px 4px rgba(80,55,30,.06),0 10px 30px rgba(80,55,30,.08);
+    --serif:"Songti SC","STSong","Noto Serif SC",Georgia,"Times New Roman",serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{margin:0;padding:0;}
   body{
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;
-    background:var(--bg); color:var(--text); font-size:15px; line-height:1.6;
-    -webkit-font-smoothing:antialiased;
+    font-family:var(--sans); color:var(--ink); font-size:15px; line-height:1.7;
+    background:
+      radial-gradient(1200px 500px at 80% -10%, #fff6e8 0%, rgba(255,246,232,0) 60%),
+      radial-gradient(900px 400px at -10% 10%, #f3ead8 0%, rgba(243,234,216,0) 55%),
+      var(--cream);
+    background-attachment:fixed; -webkit-font-smoothing:antialiased;
   }
-  a{color:var(--accent);text-decoration:none;}
-  button{font-family:inherit;cursor:pointer;border:none;background:none;}
-  .btn{
-    display:inline-flex;align-items:center;justify-content:center;gap:6px;
-    min-height:44px;padding:0 16px;border-radius:12px;font-size:15px;font-weight:600;
-    background:var(--primary);color:#fff;box-shadow:var(--shadow);transition:.15s;
-  }
-  .btn:active{transform:scale(.97);}
-  .btn.ghost{background:#fff;color:var(--primary);border:1.5px solid var(--primary);}
-  .btn.amber{background:var(--amber);}
-  .btn.green{background:var(--green);}
-  .btn.sm{min-height:36px;padding:0 12px;font-size:13px;border-radius:10px;}
+  a{color:var(--tea);text-decoration:none;}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 18px;
+    border-radius:13px;font-size:15px;font-weight:700;background:var(--coffee);color:#fff;box-shadow:var(--shadow);
+    transition:transform .12s ease, box-shadow .12s ease;}
+  .btn:active{transform:translateY(1px) scale(.98);}
+  .btn.tea{background:var(--tea);}
+  .btn.ghost{background:#fff;color:var(--coffee-d);border:1.6px solid var(--coffee);box-shadow:none;}
+  .btn.ghost.tea{color:var(--tea-d);border-color:var(--tea);}
+  .btn.sm{min-height:38px;padding:0 14px;font-size:13.5px;border-radius:11px;}
   .btn.block{width:100%;}
-  .icon{width:18px;height:18px;flex:none;}
-  .icon-lg{width:26px;height:26px;}
+  .btn:disabled{opacity:.45;pointer-events:none;}
 
-  /* layout */
   .app{display:flex;min-height:100vh;}
-  .sidebar{
-    width:230px;flex:none;background:var(--card);border-right:1px solid var(--line);
-    padding:20px 14px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:6px;
-  }
-  .brand{display:flex;align-items:center;gap:10px;padding:6px 8px 14px;font-weight:800;font-size:17px;}
-  .brand .logo{width:38px;height:38px;border-radius:11px;background:var(--primary);display:flex;align-items:center;justify-content:center;}
-  .nav-item{
-    display:flex;align-items:center;gap:11px;padding:12px 12px;border-radius:12px;
-    color:var(--muted);font-weight:600;font-size:15px;transition:.12s;width:100%;text-align:left;
-  }
-  .nav-item.active{background:var(--soft);color:var(--primary-d);}
-  .nav-item:active{background:var(--soft);}
-  .side-foot{margin-top:auto;padding:10px 8px 4px;font-size:12px;color:var(--muted);}
-  .main{flex:1;min-width:0;padding:20px 22px 120px;max-width:880px;margin:0 auto;width:100%;}
+  .sidebar{width:236px;flex:none;background:linear-gradient(180deg,#fffdf8,#fbf4e6);border-right:1px solid var(--line);
+    padding:22px 14px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:4px;}
+  .brand{display:flex;align-items:center;gap:11px;padding:4px 10px 16px;font-family:var(--serif);font-weight:800;font-size:19px;color:var(--coffee-d);}
+  .brand .logo{width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,var(--coffee),var(--rose));
+    display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow);}
+  .nav-item{display:flex;align-items:center;gap:11px;padding:12px 13px;border-radius:13px;color:var(--ink-soft);
+    font-weight:700;font-size:15px;transition:.12s;width:100%;text-align:left;}
+  .nav-item.active{background:#fff;color:var(--coffee-d);box-shadow:var(--shadow);}
+  .nav-item .badge{margin-left:auto;font-size:11px;background:var(--rose);color:#fff;border-radius:999px;padding:1px 8px;font-weight:800;}
+  .side-foot{margin-top:auto;padding:12px 10px 4px;font-size:11.5px;color:var(--ink-soft);line-height:1.6;}
+  .main{flex:1;min-width:0;padding:22px 24px 120px;max-width:920px;margin:0 auto;width:100%;}
 
-  /* topbar */
-  .topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
-  .sync{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);
-    background:#fff;border:1px solid var(--line);padding:7px 11px;border-radius:999px;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+  .sync{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--ink-soft);background:#fff;
+    border:1px solid var(--line);padding:7px 12px;border-radius:999px;}
   .dot{width:8px;height:8px;border-radius:50%;background:var(--green);}
   .tools{display:flex;gap:8px;}
   .tools .btn.ghost{min-height:38px;padding:0 12px;font-size:13px;}
 
-  /* today */
-  .today{background:linear-gradient(135deg,#fff7ef,#fff);border:1.5px solid #ffd9b8;
-    border-radius:18px;padding:16px 18px;margin-bottom:18px;box-shadow:var(--shadow);}
-  .today.alert{border-color:var(--red);background:linear-gradient(135deg,#fff1f1,#fff);}
-  .today h2{margin:0 0 10px;font-size:16px;display:flex;align-items:center;gap:8px;}
-  .titem{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px dashed var(--line);}
+  .today{background:linear-gradient(135deg,#fff8ee,#fffdf8);border:1.6px solid #f0d9b8;border-radius:20px;
+    padding:15px 18px;margin-bottom:18px;box-shadow:var(--shadow);}
+  .today.alert{border-color:var(--red);background:linear-gradient(135deg,#fff1f1,#fffdf8);}
+  .today h2{margin:0 0 9px;font-size:16px;display:flex;align-items:center;gap:8px;font-family:var(--serif);}
+  .titem{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px dashed var(--line);}
   .titem:first-of-type{border-top:none;}
   .titem .ttext{flex:1;font-size:14px;}
-  .titem.overdue .ttext{color:var(--red);font-weight:700;}
-  .titem .tbadge{font-size:11px;padding:2px 8px;border-radius:999px;background:#ffe9da;color:var(--primary-d);font-weight:700;}
-  .titem.overdue .tbadge{background:#ffd9d9;color:var(--red);}
-  .today.done{background:linear-gradient(135deg,#ecfdf3,#fff);border-color:#b7eac6;}
+  .titem.overdue .ttext{color:var(--red);font-weight:800;}
+  .titem .tbadge{font-size:11px;padding:2px 9px;border-radius:999px;background:#f6e2cf;color:var(--coffee-d);font-weight:800;}
+  .titem.overdue .tbadge{background:#fbd5d5;color:var(--red);}
+  .today.done{background:linear-gradient(135deg,#eefaf2,#fffdf8);border-color:#bfe6cd;}
   .today.done h2{color:var(--green);}
 
-  /* stats */
   .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
-  .stat{background:var(--card);border-radius:16px;padding:14px 10px;text-align:center;box-shadow:var(--shadow);}
-  .stat .num{font-size:26px;font-weight:800;color:var(--primary);line-height:1.1;}
-  .stat .lbl{font-size:12px;color:var(--muted);margin-top:4px;}
+  .stat{background:var(--paper);border-radius:17px;padding:14px 8px;text-align:center;box-shadow:var(--shadow);border:1px solid var(--line);}
+  .stat .num{font-size:27px;font-weight:800;color:var(--coffee);line-height:1.1;font-family:var(--serif);}
+  .stat .lbl{font-size:12px;color:var(--ink-soft);margin-top:4px;}
 
-  /* section */
-  .panel{display:none;animation:fade .25s ease;}
+  .panel{display:none;animation:fade .28s ease;}
   .panel.active{display:block;}
-  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
-  .section-title{font-size:15px;font-weight:800;margin:4px 2px 12px;display:flex;align-items:center;gap:8px;}
+  @keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+  .section-title{font-size:16px;font-weight:800;margin:6px 2px 13px;display:flex;align-items:center;gap:8px;font-family:var(--serif);}
+  .sub{font-size:13px;color:var(--ink-soft);margin:-6px 2px 14px;}
 
-  /* card */
-  .kc{border-radius:18px;}
-  .kc-head{background:var(--card);border-radius:18px 18px 0 0;padding:18px 18px 14px;box-shadow:var(--shadow);}
-  .kc-cat{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--primary-d);
-    background:var(--soft);padding:4px 10px;border-radius:999px;}
-  .kc-title{font-size:22px;font-weight:800;margin:10px 0 6px;}
-  .kc-level{font-size:12px;color:var(--muted);}
-  .kc-body{background:var(--card);padding:4px 18px 16px;}
-  .kc-story{font-size:15px;color:#374151;padding:12px 0;}
-  .kc-code{background:#1e2530;color:#e6edf3;border-radius:12px;padding:14px 14px;overflow-x:auto;
-    font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;font-size:13px;line-height:1.65;white-space:pre;}
-  .kc-code .c{color:#7ee787;} .kc-code .k{color:#ff7b72;} .kc-code .s{color:#a5d6ff;} .kc-code .cm{color:#8b949e;}
-  .kc-tip{display:flex;gap:9px;align-items:flex-start;background:#fffbeb;border:1px solid #fde68a;
-    border-radius:12px;padding:11px 13px;margin:14px 0 4px;font-size:13.5px;color:#92690a;}
-  .kc-foot{background:var(--card);border-radius:0 0 18px 18px;padding:14px 18px 18px;display:flex;gap:10px;flex-wrap:wrap;box-shadow:var(--shadow);}
+  /* 每日小灶卡片 */
+  .kc{border-radius:20px;overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--line);}
+  .kc-head{background:linear-gradient(135deg,var(--coffee),var(--rose));color:#fff;padding:20px 20px 16px;}
+  .kc-cat{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;background:rgba(255,255,255,.22);
+    padding:4px 11px;border-radius:999px;}
+  .kc-title{font-size:23px;font-weight:800;margin:11px 0 6px;font-family:var(--serif);}
+  .kc-level{font-size:12px;opacity:.92;}
+  .kc-body{background:var(--paper);padding:6px 20px 16px;}
+  .kc-story{font-size:15px;color:#4a3d31;padding:13px 0;}
+  .kc-code{background:#2c241c;color:#f3e9d8;border-radius:13px;padding:14px;overflow-x:auto;
+    font-family:"SFMono-Regular",Consolas,Menlo,monospace;font-size:12.5px;line-height:1.65;white-space:pre;}
+  .kc-tip{display:flex;gap:9px;align-items:flex-start;background:#fff7e6;border:1px solid #f3dca0;border-radius:13px;
+    padding:11px 13px;margin:14px 0 4px;font-size:13.5px;color:#8a6212;}
+  .kc-foot{background:var(--paper);padding:15px 20px 18px;display:flex;gap:10px;flex-wrap:wrap;}
 
-  .lib{margin-top:22px;}
   .lib-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
-  .lib-card{background:var(--card);border-radius:14px;padding:13px 14px;box-shadow:var(--shadow);text-align:left;width:100%;
-    display:flex;flex-direction:column;gap:4px;transition:.12s;}
+  .lib-card{background:var(--paper);border:1px solid var(--line);border-radius:15px;padding:13px 14px;box-shadow:var(--shadow);
+    text-align:left;width:100%;display:flex;flex-direction:column;gap:5px;transition:transform .12s ease;}
   .lib-card:active{transform:scale(.98);}
-  .lib-card .t{font-weight:700;font-size:14.5px;}
-  .lib-card .m{font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center;}
-  .lib-card .star{color:var(--amber);}
+  .lib-card .t{font-weight:800;font-size:14.5px;}
+  .lib-card .m{font-size:12px;color:var(--ink-soft);display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+  .lib-card .star{color:var(--gold);}
 
-  /* checkin */
-  .heat-wrap{background:var(--card);border-radius:18px;padding:18px;box-shadow:var(--shadow);}
+  /* 题库模块网格 */
+  .mod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px;}
+  .mod-card{position:relative;background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:16px 15px 15px;
+    box-shadow:var(--shadow);text-align:left;width:100%;transition:transform .14s ease, box-shadow .14s ease;}
+  .mod-card:hover{transform:translateY(-3px);box-shadow:0 14px 34px rgba(80,55,30,.13);}
+  .mod-card .emo{font-size:30px;}
+  .mod-card .mn{font-weight:800;font-size:16px;margin:8px 0 3px;font-family:var(--serif);}
+  .mod-card .md{font-size:12px;color:var(--ink-soft);line-height:1.5;min-height:34px;}
+  .mod-card .mc{margin-top:10px;font-size:12px;color:var(--coffee-d);font-weight:800;}
+  .mod-card .pr{position:absolute;top:13px;right:13px;font-size:11px;background:#eefaf2;color:var(--green);border-radius:999px;padding:2px 9px;font-weight:800;}
+
+  .mode-row{display:flex;gap:10px;flex-wrap:wrap;margin:4px 0 16px;}
+  .mode-btn{background:var(--paper);border:1.6px solid var(--line);border-radius:14px;padding:11px 16px;font-weight:700;font-size:14px;
+    display:flex;align-items:center;gap:8px;box-shadow:var(--shadow);transition:transform .12s;}
+  .mode-btn:active{transform:scale(.97);}
+  .mode-btn.on{border-color:var(--coffee);color:var(--coffee-d);background:#fff8ee;}
+
+  /* 答题卡 */
+  .quiz{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:var(--shadow);}
+  .q-meta{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--ink-soft);margin-bottom:8px;flex-wrap:wrap;}
+  .q-tag{background:#f0e6d4;color:var(--coffee-d);border-radius:999px;padding:2px 10px;font-weight:700;}
+  .q-diff{font-weight:800;}
+  .q-prog{height:8px;border-radius:999px;background:#eee2cf;overflow:hidden;margin:10px 0 14px;}
+  .q-prog > i{display:block;height:100%;background:linear-gradient(90deg,var(--coffee),var(--rose));width:0;transition:width .3s ease;}
+  .q-text{font-size:18px;font-weight:800;line-height:1.55;font-family:var(--serif);}
+  .opts{display:flex;flex-direction:column;gap:11px;margin:16px 0;}
+  .opt{display:flex;align-items:center;gap:12px;padding:13px 15px;border:1.6px solid var(--line);border-radius:14px;
+    background:#fff;font-size:15px;transition:.12s;text-align:left;width:100%;}
+  .opt:active{transform:scale(.99);}
+  .opt .key{width:28px;height:28px;flex:none;border-radius:9px;background:#f0e6d4;color:var(--coffee-d);font-weight:800;
+    display:flex;align-items:center;justify-content:center;font-size:14px;}
+  .opt.correct{border-color:var(--green);background:#eefaf2;color:#1f6b45;}
+  .opt.correct .key{background:var(--green);color:#fff;}
+  .opt.wrong{border-color:var(--red);background:#fdeced;color:#a3273a;}
+  .opt.wrong .key{background:var(--red);color:#fff;}
+  .opt.dim{opacity:.5;}
+  .explain{margin-top:6px;background:#fff8ee;border:1px solid #f0d9b8;border-radius:14px;padding:14px 15px;font-size:14.5px;
+    color:#5a4631;animation:fade .25s ease;}
+  .explain .eh{font-weight:800;color:var(--coffee-d);margin-bottom:5px;display:flex;align-items:center;gap:7px;}
+  .q-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;}
+
+  .quiz-sum{text-align:center;padding:24px 10px;}
+  .quiz-sum .big{font-size:54px;font-weight:800;font-family:var(--serif);color:var(--coffee);}
+  .quiz-sum .rate{font-size:17px;font-weight:800;margin:6px 0 14px;}
+
+  /* 错题本 */
+  .wrong-item{background:var(--paper);border:1px solid var(--line);border-radius:15px;padding:14px 15px;box-shadow:var(--shadow);margin-bottom:12px;}
+  .wrong-item .wq{font-weight:800;font-size:15px;}
+  .wrong-item .wm{font-size:12px;color:var(--ink-soft);margin:6px 0 10px;display:flex;gap:8px;flex-wrap:wrap;}
+  .wrong-item .wm .q-tag{font-size:11px;}
+  .empty{text-align:center;color:var(--ink-soft);padding:44px 10px;font-size:14px;}
+  .empty .big{font-size:42px;margin-bottom:8px;}
+
+  .heat-wrap{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:var(--shadow);}
   .heat{display:grid;grid-template-columns:repeat(14,1fr);gap:5px;margin-top:6px;}
-  .cell{aspect-ratio:1/1;border-radius:4px;background:#eef0f3;}
-  .cell.on{background:var(--primary);}
-  .cell.today{outline:2px solid var(--accent);outline-offset:1px;}
-  .heat-legend{display:flex;gap:10px;align-items:center;font-size:12px;color:var(--muted);margin-top:12px;}
+  .cell{aspect-ratio:1/1;border-radius:4px;background:#ece2d0;}
+  .cell.on{background:linear-gradient(135deg,var(--coffee),var(--rose));}
+  .cell.today{outline:2px solid var(--tea);outline-offset:1px;}
+  .heat-legend{display:flex;gap:10px;align-items:center;font-size:12px;color:var(--ink-soft);margin-top:12px;flex-wrap:wrap;}
   .heat-legend .cell{width:13px;height:13px;}
   .checkin-cta{margin-top:16px;}
 
-  /* favs */
-  .fav{border-radius:16px;background:var(--card);padding:14px 15px;box-shadow:var(--shadow);margin-bottom:12px;}
-  .fav .ft{font-weight:700;font-size:15px;display:flex;align-items:center;gap:8px;}
-  .fav .fm{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap;align-items:center;}
-  .pill{font-size:12px;padding:5px 11px;border-radius:999px;font-weight:700;}
-  .pill.u{background:#ffe9da;color:var(--primary-d);}
-  .pill.r{background:#e0f2fe;color:#0369a1;}
-  .pill.m{background:#dcfce7;color:#15803d;}
-  .empty{text-align:center;color:var(--muted);padding:40px 10px;font-size:14px;}
-
-  /* bottom nav (mobile) */
   .botnav{display:none;}
-  .modal-mask{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;align-items:center;justify-content:center;
+  .modal-mask{position:fixed;inset:0;background:rgba(50,35,20,.5);display:none;align-items:center;justify-content:center;
     padding:18px;z-index:50;backdrop-filter:blur(2px);}
   .modal-mask.show{display:flex;}
-  .modal{background:#fff;border-radius:18px;max-width:560px;width:100%;max-height:88vh;overflow:auto;box-shadow:var(--shadow);}
-  .modal .mhead{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;}
-  .modal .mbody{padding:4px 16px 18px;}
-
-  .toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%) translateY(20px);
-    background:#1f2937;color:#fff;padding:11px 18px;border-radius:999px;font-size:14px;opacity:0;
-    transition:.25s;pointer-events:none;z-index:60;box-shadow:var(--shadow);}
+  .modal{background:#fffdf8;border-radius:20px;max-width:580px;width:100%;max-height:88vh;overflow:auto;box-shadow:var(--shadow);border:1px solid var(--line);}
+  .modal .mhead{display:flex;justify-content:space-between;align-items:center;padding:15px 17px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fffdf8;}
+  .modal .mbody{padding:6px 17px 18px;}
+  .toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%) translateY(20px);background:#43372c;color:#fff;
+    padding:11px 18px;border-radius:999px;font-size:14px;opacity:0;transition:.25s;pointer-events:none;z-index:60;box-shadow:var(--shadow);}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .steam{display:inline-block;animation:steam 2.4s ease-in-out infinite;}
+  @keyframes steam{0%,100%{transform:translateY(0);opacity:.7;}50%{transform:translateY(-3px);opacity:1;}}
 
   @media (max-width:860px){
     .sidebar{display:none;}
-    .main{padding:16px 14px 96px;}
+    .main{padding:16px 14px 100px;}
     .stats{grid-template-columns:repeat(2,1fr);gap:10px;}
     .lib-grid{grid-template-columns:1fr;}
+    .mod-grid{grid-template-columns:repeat(2,1fr);}
     .heat{grid-template-columns:repeat(10,1fr);}
-    .botnav{display:flex;position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);
-      padding:6px 4px calc(6px + env(safe-area-inset-bottom));z-index:40;box-shadow:0 -2px 12px rgba(0,0,0,.06);}
-    .botnav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--muted);font-size:11px;font-weight:600;padding:6px 0;}
-    .botnav button.active{color:var(--primary);}
-    .botnav .icon{width:22px;height:22px;}
+    .botnav{display:flex;position:fixed;left:0;right:0;bottom:0;background:#fffdf8;border-top:1px solid var(--line);
+      padding:6px 4px calc(6px + env(safe-area-inset-bottom));z-index:40;box-shadow:0 -2px 12px rgba(80,55,30,.08);}
+    .botnav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--ink-soft);font-size:10.5px;font-weight:700;padding:6px 0;}
+    .botnav button.active{color:var(--coffee);}
+    .botnav .badge{background:var(--rose);color:#fff;border-radius:999px;padding:0 6px;font-size:9px;margin-left:2px;}
   }
 </style>
 </head>
 <body>
 <div class="app">
-  <!-- PC sidebar -->
   <aside class="sidebar">
     <div class="brand">
-      <span class="logo"><svg class="icon-lg" viewBox="0 0 24 24" fill="none"><path d="M5 4h12l-1.2 9.5L18 18l-2 .8-2.6-3.3H8.2L6.2 19l-2-.7L5 4z" fill="#fff"/><path d="M8.4 9.4h6" stroke="#ea7a2e" stroke-width="1.6" stroke-linecap="round"/><path d="M9.6 12.6h5" stroke="#ea7a2e" stroke-width="1.6" stroke-linecap="round"/></svg></span>
+      <span class="logo"><svg class="icon" viewBox="0 0 24 24" width="24" height="24" fill="none">
+        <path d="M5 4h12l-1.2 9.5L18 18l-2 .8-2.6-3.3H8.2L6.2 19l-2-.7L5 4z" fill="#fff"/>
+        <path d="M8.4 9.4h6M9.6 12.6h5" stroke="#b5651d" stroke-width="1.6" stroke-linecap="round"/></svg></span>
       <span>Java 每日小灶</span>
     </div>
-    <button class="nav-item active" data-tab="learn"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M4 5.5A2 2 0 0 1 6 4h9a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2V5.5z" stroke="currentColor" stroke-width="1.7"/><path d="M17 6.5c1.3.4 2 1 2 2v9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>每日小灶</button>
-    <button class="nav-item" data-tab="checkin"><svg class="icon" viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="15" rx="2.5" stroke="currentColor" stroke-width="1.7"/><path d="M4 9h16M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M9 14l2 2 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>学习打卡</button>
-    <button class="nav-item" data-tab="fav"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M6 4h12a1 1 0 0 1 1 1v15l-7-4-7 4V5a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>我的收藏</button>
-    <div class="side-foot">本地存储 · 数据在你的浏览器里<br/>记得偶尔导出备份 🔒</div>
+    <button class="nav-item active" data-tab="learn"><svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 5.5A2 2 0 0 1 6 4h9a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2V5.5z" stroke="currentColor" stroke-width="1.7"/><path d="M17 6.5c1.3.4 2 1 2 2v9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>每日小灶</button>
+    <button class="nav-item" data-tab="quiz"><svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M9 3h6l-1 3H10L9 3z" stroke="currentColor" stroke-width="1.6"/><rect x="4" y="6" width="16" height="14" rx="2.5" stroke="currentColor" stroke-width="1.7"/><path d="M8 11l2 2 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>题库闯关</button>
+    <button class="nav-item" data-tab="wrong"><svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14l-8-4-8 4V5z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 8v4M12 14.5v.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>错题本<span class="badge" id="sideWrong">0</span></button>
+    <button class="nav-item" data-tab="checkin"><svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="15" rx="2.5" stroke="currentColor" stroke-width="1.7"/><path d="M4 9h16M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M9 14l2 2 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>学习打卡</button>
+    <div class="side-foot">数据存于你的浏览器本地 🔒<br/>联网时题库自动从云端拉取更新</div>
   </aside>
 
   <main class="main">
     <div class="topbar">
-      <div class="sync"><span class="dot"></span><span id="syncText">本地已保存</span></div>
+      <div class="sync"><span class="dot" id="syncDot"></span><span id="syncText">本地已保存</span></div>
       <div class="tools">
-        <button class="btn ghost sm" id="btnExport"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M12 3v12m0 0 4-4m-4 4-4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 19h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>导出</button>
-        <button class="btn ghost sm" id="btnImport"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M12 15V3m0 0 4 4m-4-4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 19h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>导入</button>
+        <button class="btn ghost sm" id="btnExport"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 3v12m0 0 4-4m-4 4-4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 19h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>导出</button>
+        <button class="btn ghost sm" id="btnImport"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 15V3m0 0 4 4m-4-4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 19h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>导入题库</button>
       </div>
-      <input type="file" id="fileInput" accept="application/json" style="display:none" />
+      <input type="file" id="fileInput" accept="application/json,.json" style="display:none" />
     </div>
 
-    <!-- 今天要处理 -->
     <section class="today" id="todayBox"></section>
 
-    <!-- 统计 -->
     <div class="stats">
       <div class="stat"><div class="num" id="stStreak">0</div><div class="lbl">连续打卡</div></div>
       <div class="stat"><div class="num" id="stTotal">0</div><div class="lbl">累计打卡</div></div>
-      <div class="stat"><div class="num" id="stLearn">0</div><div class="lbl">已学天数</div></div>
-      <div class="stat"><div class="num" id="stFav">0</div><div class="lbl">收藏数</div></div>
+      <div class="stat"><div class="num" id="stDone">0</div><div class="lbl">已答/总题</div></div>
+      <div class="stat"><div class="num" id="stWrong">0</div><div class="lbl">错题数</div></div>
     </div>
 
-    <!-- 模块1 每日小灶 -->
+    <!-- 每日小灶 -->
     <section class="panel active" id="panel-learn">
       <div class="kc">
         <div class="kc-head">
@@ -205,392 +239,2144 @@
         <div class="kc-body">
           <div class="kc-story" id="kcStory"></div>
           <pre class="kc-code" id="kcCode"></pre>
-          <div class="kc-tip"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z" stroke="#f59e0b" stroke-width="1.7"/><path d="M12 8v4l3 2" stroke="#f59e0b" stroke-width="1.7" stroke-linecap="round"/></svg><span id="kcTip"></span></div>
+          <div class="kc-tip"><svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z" stroke="#e0a83c" stroke-width="1.7"/><path d="M12 8v4l3 2" stroke="#e0a83c" stroke-width="1.7" stroke-linecap="round"/></svg><span id="kcTip"></span></div>
         </div>
         <div class="kc-foot">
-          <button class="btn" id="btnLearn"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>今天学会了</button>
-          <button class="btn amber" id="btnNext">换一张</button>
-          <button class="btn ghost" id="btnFav">收藏这张</button>
+          <button class="btn" id="btnLearn">今天学会了</button>
+          <button class="btn ghost" id="btnNext">换一张</button>
+          <button class="btn ghost tea" id="btnFav">收藏这张</button>
         </div>
       </div>
-
-      <div class="lib">
-        <div class="section-title"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>翻翻知识库（共 <span id="libCount">0</span> 道）</div>
+      <div style="margin-top:22px;">
+        <div class="section-title"><svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>翻翻知识库（共 <span id="libCount">0</span> 道）</div>
         <div class="lib-grid" id="libGrid"></div>
       </div>
     </section>
 
-    <!-- 模块2 学习打卡 -->
-    <section class="panel" id="panel-checkin">
-      <div class="heat-wrap">
-        <div class="section-title" style="margin-bottom:4px;"><svg class="icon" viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="15" rx="2.5" stroke="currentColor" stroke-width="1.7"/><path d="M4 9h16M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>近 70 天打卡热力图</div>
-        <div class="heat" id="heat"></div>
-        <div class="heat-legend"><span class="cell"></span>未打卡 <span class="cell on"></span>已打卡 <span class="cell today"></span>今天</div>
-        <div class="checkin-cta">
-          <button class="btn green block" id="btnCheckin">☕ 今日打卡</button>
+    <!-- 题库闯关 -->
+    <section class="panel" id="panel-quiz">
+      <div class="section-title"><svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 3h6l-1 3H10L9 3z" stroke="currentColor" stroke-width="1.6"/><rect x="4" y="6" width="16" height="14" rx="2.5" stroke="currentColor" stroke-width="1.7"/><path d="M8 11l2 2 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>题库闯关 <span class="steam">☕</span></div>
+      <div class="sub" id="quizStatus">正在从云端拉取题库…</div>
+
+      <div id="quizHome">
+        <div class="mode-row">
+          <button class="mode-btn on" data-mode="all">🎲 随机闯关</button>
+          <button class="mode-btn" data-mode="wrong">📕 只刷错题</button>
+          <button class="mode-btn" data-mode="weak">🎯 薄弱模块</button>
         </div>
+        <div class="section-title" style="font-size:14px;margin-top:6px;">按模块练习</div>
+        <div class="mod-grid" id="modGrid"></div>
       </div>
+
+      <div id="quizPlay" style="display:none;"></div>
     </section>
 
-    <!-- 模块3 我的收藏 -->
-    <section class="panel" id="panel-fav">
-      <div class="section-title"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M6 4h12a1 1 0 0 1 1 1v15l-7-4-7 4V5a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>我的收藏（想复习的卡片）</div>
-      <div id="favList"></div>
-      <div style="margin-top:18px;text-align:center;">
-        <button class="btn ghost sm" id="btnClear">清空示例数据</button>
+    <!-- 错题本 -->
+    <section class="panel" id="panel-wrong">
+      <div class="section-title"><svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14l-8-4-8 4V5z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 8v4M12 14.5v.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>错题本（答错自动收集，可重练）</div>
+      <div id="wrongList"></div>
+    </section>
+
+    <!-- 学习打卡 -->
+    <section class="panel" id="panel-checkin">
+      <div class="heat-wrap">
+        <div class="section-title" style="margin-bottom:4px;"><svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="15" rx="2.5" stroke="currentColor" stroke-width="1.7"/><path d="M4 9h16M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>近 70 天打卡热力图</div>
+        <div class="heat" id="heat"></div>
+        <div class="heat-legend"><span class="cell"></span>未打卡 <span class="cell on"></span>已打卡 <span class="cell today"></span>今天</div>
+        <div class="checkin-cta"><button class="btn tea block" id="btnCheckin">☕ 今日打卡</button></div>
       </div>
     </section>
   </main>
 </div>
 
-<!-- mobile bottom nav -->
 <nav class="botnav">
-  <button class="active" data-tab="learn"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M4 5.5A2 2 0 0 1 6 4h9a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2V5.5z" stroke="currentColor" stroke-width="1.7"/><path d="M17 6.5c1.3.4 2 1 2 2v9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>小灶</button>
-  <button data-tab="checkin"><svg class="icon" viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="15" rx="2.5" stroke="currentColor" stroke-width="1.7"/><path d="M4 9h16M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M9 14l2 2 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>打卡</button>
-  <button data-tab="fav"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M6 4h12a1 1 0 0 1 1 1v15l-7-4-7 4V5a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>收藏</button>
+  <button class="active" data-tab="learn"><svg class="icon" width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 5.5A2 2 0 0 1 6 4h9a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2V5.5z" stroke="currentColor" stroke-width="1.7"/><path d="M17 6.5c1.3.4 2 1 2 2v9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>小灶</button>
+  <button data-tab="quiz"><svg class="icon" width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M9 3h6l-1 3H10L9 3z" stroke="currentColor" stroke-width="1.6"/><rect x="4" y="6" width="16" height="14" rx="2.5" stroke="currentColor" stroke-width="1.7"/><path d="M8 11l2 2 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>闯关</button>
+  <button data-tab="wrong"><svg class="icon" width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14l-8-4-8 4V5z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>错题<span class="badge" id="botWrong">0</span></button>
+  <button data-tab="checkin"><svg class="icon" width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="15" rx="2.5" stroke="currentColor" stroke-width="1.7"/><path d="M4 9h16M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M9 14l2 2 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>打卡</button>
 </nav>
 
-<!-- modal -->
-<div class="modal-mask" id="modalMask">
-  <div class="modal" id="modalBox"></div>
-</div>
+<div class="modal-mask" id="modalMask"><div class="modal" id="modalBox"></div></div>
 <div class="toast" id="toast"></div>
 
 <script>
-/* ===== 知识库（内置内容，不随示例数据清空） ===== */
-const CARDS = [
-  {id:'c1',title:'变量：贴了名字的收纳盒',cat:'基础',level:1,
-   story:'变量就像书桌上贴了标签的收纳盒——标签是变量名，盒子里装的是值。你喊一声标签名，就能拿出里面的东西。改值只是换掉盒里的内容，盒子还是那个盒子。',
-   code:'int age = 18;          // 贴个"age"标签，盒里放数字 18\nString name = "小明"; // 贴个"name"标签，盒里放文字\nage = 19;              // 换一个值，盒子不变',
-   tip:'变量名用小驼峰，如 ageOfUser；别用空格或中文当变量名哦。'},
-  {id:'c2',title:'数据类型：盒子有不同的形状',cat:'基础',level:1,
-   story:'int 装整数、double 装小数、boolean 是个开关盒（只能 true/false）、char 装单个字符、String 装一整句文字。你不能用"整数盒"装一整段话，就像保鲜盒装不下大西瓜——选对盒子很重要。',
-   code:'int apples = 3;        // 整数盒\nfloat price = 3.5f;    // 小数盒\nboolean isOpen = true; // 开关盒：真/假\nchar grade = \'A\';      // 单个字符盒',
-   tip:'小数默认是 double，写 float 记得末尾加 f。'},
-  {id:'c3',title:'String 不可变：倔强的便签纸',cat:'基础',level:2,
-   story:'String 像一张写死的便签：你想改内容，它不会在原纸上涂改，而是给你一张新纸写上新内容，旧的扔掉（等垃圾回收）。所以疯狂拼接字符串时，用 StringBuilder 更省纸。',
-   code:'String s = "你好";\ns = s + "世界";  // 不是改原纸，而是生成新纸"你好世界"',
-   tip:'循环里大量拼字符串，记得用 StringBuilder，性能更好。'},
-  {id:'c4',title:'== 和 equals：认人 vs 认脸',cat:'基础',level:2,
-   story:'== 问的是"是不是同一个人"（比内存地址）；equals 问的是"长得像不像"（比内容）。两个人长得很像，但不是同一个人，所以 == 为 false，equals 为 true。',
-   code:'String a = new String("hi");\nString b = new String("hi");\nSystem.out.println(a == b);       // false：两人\nSystem.out.println(a.equals(b));  // true：长得一样',
-   tip:'比字符串内容永远用 equals，别用 ==。'},
-  {id:'c5',title:'if / else：人生的岔路口',cat:'流程',level:1,
-   story:'if 是"如果满足条件，就走这条路"；else 是"否则走另一条路"。程序每天就在这些岔路口做选择。',
-   code:'int score = 85;\nif (score >= 60) {\n    System.out.println("及格啦！");\n} else {\n    System.out.println("再接再厉~");\n}',
-   tip:'条件用 == 比较时小心别写成 =（赋值）。'},
-  {id:'c6',title:'for 循环：永不疲倦的复读机',cat:'流程',level:1,
-   story:'for 循环让电脑把同一件事重复 N 遍还不会烦。你只要告诉它：从哪开始、到哪结束、每次迈多大步。',
-   code:'for (int i = 1; i <= 5; i++) {\n    System.out.println("第 " + i + " 遍：Java 真香");\n}',
-   tip:'i++ 是"步长 +1"；for 里定义的 i 只在循环内有效。'},
-  {id:'c7',title:'数组：一排编了号的储物柜',cat:'集合',level:2,
-   story:'数组像一排储物柜，从 0 开始编号。新手最容易绊倒的门槛：第一个柜子是 0 号，不是 1 号！取第 3 个要用下标 2。',
-   code:'int[] nums = {10, 20, 30};\nSystem.out.println(nums[0]); // 10，注意是 0 号柜！\nSystem.out.println(nums[2]); // 30',
-   tip:'下标越界（超出长度）会报错 ArrayIndexOutOfBoundsException。'},
-  {id:'c8',title:'ArrayList：会伸缩的魔法口袋',cat:'集合',level:2,
-   story:'普通数组柜子数量固定，ArrayList 是个会自己变大的魔法口袋，想装多少装多少，还能随时加减。',
-   code:'ArrayList<String> list = new ArrayList<>();\nlist.add("Java");\nlist.add("Python");\nSystem.out.println(list.size()); // 2',
-   tip:'用 list.get(i) 取元素，用 list.remove(i) 删元素。'},
-  {id:'c9',title:'方法：封装好的小机器',cat:'基础',level:2,
-   story:'方法像一个会干活的小机器：你投进原料（参数），它吐出成品（返回值）。写好一次，随时调用，不用重复造轮子。',
-   code:'static int add(int a, int b) {\n    return a + b;   // 投进两数，吐出和\n}\n// 调用：add(3, 5) -> 8',
-   tip:'一个方法只干一件事，名字要见名知意，比如 calculateTotal。'},
-  {id:'c10',title:'try-catch：给代码买份保险',cat:'异常',level:2,
-   story:'try 里放"可能翻车"的代码，catch 是备胎方案——真翻车了就走 catch，程序不崩溃，优雅收场。',
-   code:'try {\n    int r = 10 / 0;        // 会翻车（除以0）\n} catch (Exception e) {\n    System.out.println("出错了但不崩");\n}',
-   tip:'只 catch 你处理得了的异常，别一刀切吞掉所有错误。'},
-  {id:'c11',title:'static：全村共享的老水井',cat:'面向对象',level:3,
-   story:'普通变量是各家自家的水缸，static 变量是全村共用的老水井——谁都能打，一个人改了大家都看得到。static 方法不用 new 对象就能直接用。',
-   code:'class Counter {\n    static int count = 0;  // 全村共用的井\n}\nCounter.count++;  // 不用 new，直接打水',
-   tip:'工具类方法常写成 static，比如 Math.max()。'},
-  {id:'c12',title:'继承：青出于蓝',cat:'面向对象',level:3,
-   story:'子类继承父类，就像孩子继承爸妈的特征，还能自己加新本领。复用代码，少写重复，是面向对象的核心之一。',
-   code:'class Animal { void eat() { System.out.println("吃"); } }\nclass Cat extends Animal {\n    void meow() { System.out.println("喵"); }\n}',
-   tip:'Java 是单继承：一个类只能有一个亲爹（父类）。'},
-  {id:'c13',title:'多态：同一句"叫"，不同表现',cat:'面向对象',level:3,
-   story:'同样一句"叫"，狗是汪汪、猫是喵喵。父类引用指向子类对象，调用同一方法却表现不同——这就是多态，灵活又解耦。',
-   code:'Animal a = new Cat();\na.eat();  // 实际调用 Cat 的表现',
-   tip:'面向接口/父类编程，运行时再决定具体行为，这就是多态的魅力。'},
-  {id:'c14',title:'HashMap：带编号的储物柜系统',cat:'集合',level:3,
-   story:'HashMap 像个智能储物柜：你给把"钥匙"(key)，它算出柜子编号直接存/取，速度飞快。同一把钥匙只能有一份，重复放会覆盖。',
-   code:'HashMap<String, Integer> map = new HashMap<>();\nmap.put("苹果", 3);\nSystem.out.println(map.get("苹果")); // 3',
-   tip:'key 要稳定且重写 equals/hashCode；查找速度是 O(1) 级别。'},
-  {id:'c15',title:'垃圾回收 GC：勤快的保洁阿姨',cat:'JVM',level:3,
-   story:'JVM 里有位保洁阿姨(GC)，专门收拾那些"没人再引用"的对象（没被任何变量指着），自动清理释放内存。你基本不用操心，但别不小心一直抱着大对象不放。',
-   code:'// 没有代码也能懂：\n// 当没有任何变量指向一个对象时\n// GC 会在合适的时候把它收走',
-   tip:'对象的"生日"是 new 的那一刻；"离职"是没人引用它的时候。'}
+/* ===== 内置题库（离线兜底副本，联网时以云端 questions.json 为准） ===== */
+const EMBEDDED_BANK = {
+ "version": 1,
+ "modules": [
+  {
+   "id": "basic",
+   "name": "基础语法",
+   "emoji": "☕",
+   "desc": "变量、类型、运算符、流程控制、数组、方法"
+  },
+  {
+   "id": "oop",
+   "name": "面向对象",
+   "emoji": "🧱",
+   "desc": "类与对象、封装、继承、多态、抽象类、接口"
+  },
+  {
+   "id": "string",
+   "name": "字符串与类",
+   "emoji": "🧵",
+   "desc": "String、StringBuilder、Math、Object"
+  },
+  {
+   "id": "collection",
+   "name": "集合框架",
+   "emoji": "📚",
+   "desc": "List、Set、Map、HashMap、并发容器"
+  },
+  {
+   "id": "exception",
+   "name": "异常处理",
+   "emoji": "🛟",
+   "desc": "异常体系、try-catch、throw、自定义异常"
+  },
+  {
+   "id": "generic",
+   "name": "泛型·反射",
+   "emoji": "🔍",
+   "desc": "泛型擦除、通配符、反射、注解"
+  },
+  {
+   "id": "concurrency",
+   "name": "多线程并发",
+   "emoji": "🏃",
+   "desc": "线程、锁、volatile、线程池、并发容器"
+  },
+  {
+   "id": "jvm",
+   "name": "JVM 与内存",
+   "emoji": "⚙️",
+   "desc": "内存区域、GC、类加载、JMM"
+  },
+  {
+   "id": "modern",
+   "name": "Java 新特性",
+   "emoji": "✨",
+   "desc": "Lambda、Stream、Optional、Record、虚拟线程"
+  },
+  {
+   "id": "io",
+   "name": "IO 与 NIO",
+   "emoji": "📂",
+   "desc": "流分类、缓冲、文件、BIO/NIO/AIO"
+  }
+ ],
+ "questions": [
+  {
+   "id": "b01",
+   "module": "basic",
+   "level": 1,
+   "tags": [
+    "数据类型"
+   ],
+   "q": "在 Java 中，用来声明一个整数的关键字是？",
+   "options": [
+    "int",
+    "Integer",
+    "num",
+    "var"
+   ],
+   "answer": 0,
+   "explain": "int 是 8 种基本类型之一，专门装整数；Integer 是它的‘包装盒’（引用类型）；num 不是 Java 关键字；var 是后来才有的局部变量类型推断，不是‘整数专用’。"
+  },
+  {
+   "id": "b02",
+   "module": "basic",
+   "level": 1,
+   "tags": [
+    "数据类型"
+   ],
+   "q": "下面哪个不属于 Java 的 8 种基本数据类型？",
+   "options": [
+    "int",
+    "double",
+    "String",
+    "boolean"
+   ],
+   "answer": 2,
+   "explain": "8 种基本类型：byte/short/int/long/float/double/char/boolean。String 是引用类型（对象），不是基本类型，别被它的‘常用’骗了。"
+  },
+  {
+   "id": "b03",
+   "module": "basic",
+   "level": 1,
+   "tags": [
+    "运算符"
+   ],
+   "q": "执行 System.out.println(10 / 3); 会输出什么？",
+   "options": [
+    "3.33",
+    "3",
+    "3.0",
+    "编译报错"
+   ],
+   "answer": 1,
+   "explain": "两个整数相除，Java 做的是‘整数除法’，直接砍掉小数部分，得到 3。想要 3.33 得先让其中一方变成小数：10.0 / 3。"
+  },
+  {
+   "id": "b04",
+   "module": "basic",
+   "level": 1,
+   "tags": [
+    "运算符"
+   ],
+   "q": "三元运算符  a > b ? a : b  的作用是？",
+   "options": [
+    "取 a 和 b 中较大的",
+    "取 a 和 b 中较小的",
+    "判断 a 是否等于 b",
+    "把 a 和 b 相加"
+   ],
+   "answer": 0,
+   "explain": "这是 Java 里的‘迷你 if’：条件成立取冒号前，不成立取冒号后。a>b 时拿 a，否则拿 b，正好是‘取较大值’。",
+   "code": "int big = a > b ? a : b;  // 谁大要谁"
+  },
+  {
+   "id": "b05",
+   "module": "basic",
+   "level": 1,
+   "tags": [
+    "流程控制"
+   ],
+   "q": "for 循环里单独写 i++ 和 ++i，效果上？",
+   "options": [
+    "完全一样",
+    "i++ 更快",
+    "++i 会多执行一次",
+    "会编译报错"
+   ],
+   "answer": 0,
+   "explain": "当这两者‘独立成句’（不把返回值赋给别人）时，都是让 i 加 1，没区别。只有像 x = i++ 和 x = ++i 这种‘要拿返回值’时才不同。"
+  },
+  {
+   "id": "b06",
+   "module": "basic",
+   "level": 2,
+   "tags": [
+    "流程控制"
+   ],
+   "q": "Java 14+ 的 switch 表达式可以用箭头 -> 且通常不需要写 break，对吗？",
+   "options": [
+    "对，箭头语法自带‘不贯穿’",
+    "错，箭头也要写 break",
+    "只对整数有效",
+    "这是 Java 21 才有的"
+   ],
+   "answer": 0,
+   "explain": "switch 表达式（带 ->）每个分支自动结束，不会‘贯穿’到下一个，所以不用 break。旧式 case 才容易忘记 break 翻车。",
+   "code": "switch(x){\n  case 1 -> System.out.println(\"一\");\n  case 2 -> System.out.println(\"二\");\n}"
+  },
+  {
+   "id": "b07",
+   "module": "basic",
+   "level": 1,
+   "tags": [
+    "变量"
+   ],
+   "q": "下面哪个是合法的 Java 变量名？",
+   "options": [
+    "2name",
+    "name-1",
+    "_name",
+    "class"
+   ],
+   "answer": 2,
+   "explain": "变量名不能以数字开头、不能含减号、不能是关键字。_name 以下划线开头，完全合法；class 是关键字，不能当变量名。"
+  },
+  {
+   "id": "b08",
+   "module": "basic",
+   "level": 1,
+   "tags": [
+    "流程控制"
+   ],
+   "q": "break 和 continue 在循环里的区别是？",
+   "options": [
+    "break 跳出整个循环，continue 跳过本次继续下一轮",
+    "两者一样",
+    "continue 跳出循环",
+    "break 跳过本次"
+   ],
+   "answer": 0,
+   "explain": "break 像‘紧急出口’——直接结束整个循环；continue 像‘这轮算了’——跳过本次剩余代码，进入下一轮。"
+  },
+  {
+   "id": "b09",
+   "module": "basic",
+   "level": 2,
+   "tags": [
+    "方法"
+   ],
+   "q": "方法重载（overload）的要求是？",
+   "options": [
+    "方法名相同，参数列表不同",
+    "方法名不同，返回值不同",
+    "必须在不同类里",
+    "返回值必须不同"
+   ],
+   "answer": 0,
+   "explain": "重载看‘名同 + 参数不同（个数/类型/顺序）’，和返回值、抛不抛异常都没关系。就像同名奶茶店，加料不同就是不同产品。"
+  },
+  {
+   "id": "b10",
+   "module": "basic",
+   "level": 2,
+   "tags": [
+    "Math"
+   ],
+   "q": "Math.round(2.5) 和 Math.round(-2.5) 的结果分别是？",
+   "options": [
+    "3 和 -2",
+    "2 和 -3",
+    "3 和 -3",
+    "2 和 -2"
+   ],
+   "answer": 0,
+   "explain": "round 是‘四舍五入’但规则是向正无穷靠：2.5→3，-2.5→-2（因为 -2 比 -3 更靠正方向）。记住‘.5 往大的数靠’就不会错。",
+   "code": "Math.round(2.5);   // 3\nMath.round(-2.5);  // -2"
+  },
+  {
+   "id": "o01",
+   "module": "oop",
+   "level": 1,
+   "tags": [
+    "三大特性"
+   ],
+   "q": "面向对象编程的三大特性是？",
+   "options": [
+    "封装、继承、多态",
+    "抽象、封装、重载",
+    "继承、多态、递归",
+    "类、对象、方法"
+   ],
+   "answer": 0,
+   "explain": "封装=藏起细节只露接口；继承=子类复用父类；多态=同一调用表现不同。这‘三件套’是 OOP 的灵魂。"
+  },
+  {
+   "id": "o02",
+   "module": "oop",
+   "level": 1,
+   "tags": [
+    "构造方法"
+   ],
+   "q": "关于构造方法，说法正确的是？",
+   "options": [
+    "名字必须和类名相同，且没有返回值类型",
+    "必须有返回值 int",
+    "只能用 private 修饰",
+    "必须写返回值 void"
+   ],
+   "answer": 0,
+   "explain": "构造方法是‘建对象时的初始化小工’：名字=类名，连 void 都不能写（写了就变成普通方法）。new 的时候它自动上岗。"
+  },
+  {
+   "id": "o03",
+   "module": "oop",
+   "level": 1,
+   "tags": [
+    "this"
+   ],
+   "q": "this 关键字指代的是？",
+   "options": [
+    "当前正在创建/使用的这个对象",
+    "父类对象",
+    "静态方法",
+    "类本身"
+   ],
+   "answer": 0,
+   "explain": "this 就是‘我’——当前这个对象实例。常用在构造方法里区分成员变量和参数：this.name = name。"
+  },
+  {
+   "id": "o04",
+   "module": "oop",
+   "level": 1,
+   "tags": [
+    "继承"
+   ],
+   "q": "Java 中表示‘继承’关系的关键字是？",
+   "options": [
+    "extends",
+    "implements",
+    "inherit",
+    "super"
+   ],
+   "answer": 0,
+   "explain": "class 子类 extends 父类。Java 是‘单继承’——一个类只能有一个亲爹（父类），但能实现多个接口。"
+  },
+  {
+   "id": "o05",
+   "module": "oop",
+   "level": 2,
+   "tags": [
+    "多态"
+   ],
+   "q": "父类引用指向子类对象，调用被子类重写的方法时，实际执行的是？",
+   "options": [
+    "子类的方法",
+    "父类的方法",
+    "编译报错",
+    "随机一个"
+   ],
+   "answer": 0,
+   "explain": "多态的精髓：编译看左边（父类），运行看右边（子类）。同样一句 animal.eat()，狗对象就汪汪、猫对象就喵喵。"
+  },
+  {
+   "id": "o06",
+   "module": "oop",
+   "level": 2,
+   "tags": [
+    "抽象类"
+   ],
+   "q": "抽象类能用 final 修饰吗？",
+   "options": [
+    "不能，会自相矛盾",
+    "能，禁止被继承",
+    "能，禁止被实例化",
+    "无所谓"
+   ],
+   "answer": 0,
+   "explain": "抽象类的存在意义就是‘被继承’，final 又禁止继承，两者打架。所以 Java 直接不允许 final 修饰抽象类。"
+  },
+  {
+   "id": "o07",
+   "module": "oop",
+   "level": 2,
+   "tags": [
+    "接口"
+   ],
+   "q": "一个类可以‘实现’多个接口吗？",
+   "options": [
+    "可以，用逗号分隔多个 interface",
+    "不可以，只能实现一个",
+    "只能实现 2 个",
+    "必须和父类数量一致"
+   ],
+   "answer": 0,
+   "explain": "接口支持‘多实现’：class A implements B, C, D。这正是单继承不足时的补丁——一个类只能有一个爹，但能签多份‘能力合同’。"
+  },
+  {
+   "id": "o08",
+   "module": "oop",
+   "level": 1,
+   "tags": [
+    "抽象类"
+   ],
+   "q": "抽象方法必须出现在哪里？",
+   "options": [
+    "抽象类或接口中",
+    "只能普通类里",
+    "只能 final 类里",
+    "任何类都行"
+   ],
+   "answer": 0,
+   "explain": "抽象方法（没有方法体、靠子类补完）只能待在抽象类或接口里。普通类要是敢写抽象方法，编译器会当场罢工。"
+  },
+  {
+   "id": "o09",
+   "module": "oop",
+   "level": 2,
+   "tags": [
+    "继承"
+   ],
+   "q": "子类构造方法里调用父类构造 super(...)，必须放在第几行？",
+   "options": [
+    "第一行",
+    "最后一行",
+    "任意位置",
+    "不需要写"
+   ],
+   "answer": 0,
+   "explain": "‘先有爹再有儿’：子类构造第一步就得先调父类构造，所以 super(...) 必须放第一行，否则编译器报错。"
+  },
+  {
+   "id": "o10",
+   "module": "oop",
+   "level": 1,
+   "tags": [
+    "封装"
+   ],
+   "q": "封装的主要好处是？",
+   "options": [
+    "隐藏实现细节、保护数据、降低耦合",
+    "让程序跑得更快",
+    "减少代码行数",
+    "必须使用接口"
+   ],
+   "answer": 0,
+   "explain": "封装像给对象装了个‘前台’：内部怎么存你别管，只通过 getter/setter 这扇门进出，数据更安全、改动不影响外面。"
+  },
+  {
+   "id": "s01",
+   "module": "string",
+   "level": 1,
+   "tags": [
+    "String"
+   ],
+   "q": "说 String 是‘不可变’的，意思是？",
+   "options": [
+    "内容创建后不能改，改了会生成新对象",
+    "永远不能赋新值",
+    "不能比较",
+    "不能转成大写"
+   ],
+   "answer": 0,
+   "explain": "String 像写死的便签：你‘修改’它，其实是另写一张新便签，旧的那张还在等 GC 收走。所以疯狂拼接字符串要用 StringBuilder。"
+  },
+  {
+   "id": "s02",
+   "module": "string",
+   "level": 2,
+   "tags": [
+    "拼接"
+   ],
+   "q": "在循环里频繁拼接字符串，应该用？",
+   "options": [
+    "StringBuilder",
+    "String 直接 +",
+    "String 数组",
+    "char"
+   ],
+   "answer": 0,
+   "explain": "String 每拼一次都生成新对象，循环里拼 1 万次就造 1 万个垃圾。StringBuilder 是可伸缩的‘草稿本’，同一张纸上改，效率飞起。"
+  },
+  {
+   "id": "s03",
+   "module": "string",
+   "level": 2,
+   "tags": [
+    "== vs equals"
+   ],
+   "q": "String a = new String(\"hi\"); String b = new String(\"hi\"); 则 a == b 与 a.equals(b) 分别是？",
+   "options": [
+    "false 和 true",
+    "true 和 false",
+    "都 true",
+    "都 false"
+   ],
+   "answer": 0,
+   "explain": "== 比‘是不是同一个人’（内存地址）：new 了两次，是两个人→false。equals 比‘长得像不像’（内容）：都是 hi→true。"
+  },
+  {
+   "id": "s04",
+   "module": "string",
+   "level": 2,
+   "tags": [
+    "常量池"
+   ],
+   "q": "String s1 = \"a\"; 和 String s2 = new String(\"a\"); 的主要区别？",
+   "options": [
+    "前者可能指向常量池，后者一定在堆里新建",
+    "完全一样",
+    "后者更快",
+    "前者会报错"
+   ],
+   "answer": 0,
+   "explain": "写死的 \"a\" 会被放进‘字符串常量池’复用（s1、s2 都写 \"a\" 时其实是同一份）；new 则铁定在堆里另开一份，地址不同。"
+  },
+  {
+   "id": "s05",
+   "module": "string",
+   "level": 1,
+   "tags": [
+    "空指针"
+   ],
+   "q": "String s = null; s.length(); 会发生什么？",
+   "options": [
+    "抛出 NullPointerException",
+    "返回 0",
+    "编译报错",
+    "返回 null"
+   ],
+   "answer": 0,
+   "explain": "s 是个‘空盒子’——连对象都没有，却要去盒子里数长度，自然空指针。判空（s != null && !s.isEmpty()）是日常必修课。"
+  },
+  {
+   "id": "s06",
+   "module": "string",
+   "level": 2,
+   "tags": [
+    "线程安全"
+   ],
+   "q": "关于 StringBuilder 和 StringBuffer，正确的是？",
+   "options": [
+    "StringBuilder 快但不安全，StringBuffer 安全但稍慢",
+    "两者都线程安全",
+    "StringBuilder 线程安全",
+    "两者都慢"
+   ],
+   "answer": 0,
+   "explain": "StringBuffer 的方法加了 synchronized（安全，但排队慢）；StringBuilder 没加（单线程下更快）。单线程用 StringBuilder，多线程才考虑 Buffer。"
+  },
+  {
+   "id": "s07",
+   "module": "string",
+   "level": 1,
+   "tags": [
+    "常用方法"
+   ],
+   "q": "要把字符串反转，最简单的方式是？",
+   "options": [
+    "用 StringBuilder 的 reverse()",
+    "手写循环一个个换",
+    "substring 拼接",
+    "toLowerCase"
+   ],
+   "answer": 0,
+   "explain": "new StringBuilder(\"abcd\").reverse() 一行搞定，得到 \"dcba\"。别自己造轮子啦。",
+   "code": "String r = new StringBuilder(\"abcd\").reverse().toString(); // dcba"
+  },
+  {
+   "id": "s08",
+   "module": "string",
+   "level": 1,
+   "tags": [
+    "常用方法"
+   ],
+   "q": "String.valueOf(123) 得到的结果是？",
+   "options": [
+    "字符串 \"123\"",
+    "整数 123",
+    "编译报错",
+    "null"
+   ],
+   "answer": 0,
+   "explain": "valueOf 是‘万能转换机’，把各种类型变成字符串。数字、对象、布尔都能转，是拼接输出时的好帮手。"
+  },
+  {
+   "id": "c01",
+   "module": "collection",
+   "level": 1,
+   "tags": [
+    "List/Set/Map"
+   ],
+   "q": "List、Set、Map 三者最核心的区别是？",
+   "options": [
+    "List 有序可重复；Set 不可重复；Map 存键值对",
+    "三者完全一样",
+    "Map 有序可重复",
+    "Set 存键值对"
+   ],
+   "answer": 0,
+   "explain": "List 像排队（有序、能重复）；Set 像会员名册（不允许重名）；Map 像通讯录（一个名字 key 对应一个号码 value）。"
+  },
+  {
+   "id": "c02",
+   "module": "collection",
+   "level": 1,
+   "tags": [
+    "ArrayList"
+   ],
+   "q": "ArrayList 的底层数据结构是？",
+   "options": [
+    "动态数组",
+    "双向链表",
+    "红黑树",
+    "哈希表"
+   ],
+   "answer": 0,
+   "explain": "ArrayList 底层是‘会自己长大的数组’：按下标查快（O(1)），但中间插删要搬数据，慢。要频繁增删就用 LinkedList。"
+  },
+  {
+   "id": "c03",
+   "module": "collection",
+   "level": 2,
+   "tags": [
+    "LinkedList"
+   ],
+   "q": "LinkedList 更适合哪种场景？",
+   "options": [
+    "频繁在中间增删元素",
+    "按下标随机访问",
+    "元素个数固定",
+    "需要线程安全"
+   ],
+   "answer": 0,
+   "explain": "LinkedList 是双向链表，增删只改几个指针，快；但想查第 100 个得从头数过去，慢。‘增删多、查询少’就选它。"
+  },
+  {
+   "id": "c04",
+   "module": "collection",
+   "level": 3,
+   "tags": [
+    "HashMap"
+   ],
+   "q": "JDK 8 中 HashMap 的底层结构是？",
+   "options": [
+    "数组 + 链表 + 红黑树",
+    "纯数组",
+    "纯链表",
+    "纯红黑树"
+   ],
+   "answer": 0,
+   "explain": "HashMap 是‘带索引的柜子’：先用哈希算出柜号（数组下标），冲突了就挂成链表；链表太长（≥8 且数组够大）升级成红黑树，查询不退化。"
+  },
+  {
+   "id": "c05",
+   "module": "collection",
+   "level": 3,
+   "tags": [
+    "并发"
+   ],
+   "q": "在多线程环境下，HashMap 的线程安全替代品首选？",
+   "options": [
+    "ConcurrentHashMap",
+    "Hashtable",
+    "仍然用 HashMap",
+    "Vector"
+   ],
+   "answer": 0,
+   "explain": "ConcurrentHashMap 用分段/CAS + 局部锁，并发下既安全又高效；老古董 Hashtable 全程 synchronized 太慢，基本被淘汰。"
+  },
+  {
+   "id": "c06",
+   "module": "collection",
+   "level": 2,
+   "tags": [
+    "HashSet"
+   ],
+   "q": "HashSet 靠什么来保证元素不重复？",
+   "options": [
+    "hashCode() + equals()",
+    "只靠 equals()",
+    "只靠 hashCode()",
+    "靠数组下标"
+   ],
+   "answer": 0,
+   "explain": "先比 hashCode（快速定位柜子），柜子里再比 equals（精确认人）。所以重写 equals 时务必一起重写 hashCode，否则去重会失灵。"
+  },
+  {
+   "id": "c07",
+   "module": "collection",
+   "level": 2,
+   "tags": [
+    "HashMap"
+   ],
+   "q": "HashMap 的默认初始容量和负载因子是？",
+   "options": [
+    "容量 16，负载因子 0.75",
+    "容量 10，负载因子 1.0",
+    "容量 8，负载因子 0.5",
+    "容量 32，负载因子 0.9"
+   ],
+   "answer": 0,
+   "explain": "默认 16 个柜子，装到 75%（12 个）就‘扩容翻倍’重新分配。负载因子调高省空间但冲突多，调低则反之。"
+  },
+  {
+   "id": "c08",
+   "module": "collection",
+   "level": 1,
+   "tags": [
+    "遍历"
+   ],
+   "q": "遍历一个 List，推荐的方式是？",
+   "options": [
+    "增强 for 循环或迭代器",
+    "用下标硬算",
+    "递归",
+    "多线程"
+   ],
+   "answer": 0,
+   "explain": "for (String s : list) 写起来清爽；要在遍历时删除元素，就用 Iterator 的 remove()，避免 fail-fast 抛异常。"
+  },
+  {
+   "id": "c09",
+   "module": "collection",
+   "level": 2,
+   "tags": [
+    "HashMap"
+   ],
+   "q": "HashMap 允许 key 为 null 吗？",
+   "options": [
+    "允许，且最多一个 null key",
+    "不允许任何 null",
+    "允许任意多个 null key",
+    "只允许 value 为 null"
+   ],
+   "answer": 0,
+   "explain": "HashMap 很宽容：key 可以有一个 null（统一放到 0 号桶），value 也可以多个 null。而 Hashtable 连一个 null 都不让。"
+  },
+  {
+   "id": "c10",
+   "module": "collection",
+   "level": 2,
+   "tags": [
+    "Collections"
+   ],
+   "q": "Collections 和 Collection 的关系是？",
+   "options": [
+    "Collection 是接口，Collections 是工具类",
+    "两者完全一样",
+    "Collections 是接口",
+    "Collection 是工具类"
+   ],
+   "answer": 0,
+   "explain": "Collection 是‘大家族接口’（List/Set 的祖宗）；Collections 是‘工具箱’（sort、reverse、synchronizedList 等静态方法），名字多一个 s 别搞混。"
+  },
+  {
+   "id": "e01",
+   "module": "exception",
+   "level": 1,
+   "tags": [
+    "体系"
+   ],
+   "q": "Java 异常体系的顶层父类是？",
+   "options": [
+    "Throwable",
+    "Exception",
+    "Error",
+    "RuntimeException"
+   ],
+   "answer": 0,
+   "explain": "Throwable 是‘总管理员’，下面分两支：Error（系统级灾难，别想着catch）和 Exception（你能处理的异常）。"
+  },
+  {
+   "id": "e02",
+   "module": "exception",
+   "level": 1,
+   "tags": [
+    "Error"
+   ],
+   "q": "Error 和 Exception 的主要区别？",
+   "options": [
+    "Error 是严重系统错误通常不该捕获，Exception 是可处理的",
+    "Error 能被捕获，Exception 不能",
+    "两者没区别",
+    "Exception 更严重的"
+   ],
+   "answer": 0,
+   "explain": "OutOfMemoryError 这类 Error 是 JVM 快撑不住了，catch 也救不回来；Exception 才是你日常该处理的‘小毛病’。"
+  },
+  {
+   "id": "e03",
+   "module": "exception",
+   "level": 2,
+   "tags": [
+    "运行时异常"
+   ],
+   "q": "NullPointerException 属于哪一类异常？",
+   "options": [
+    "运行时异常（RuntimeException），不强制捕获",
+    "编译时检查异常",
+    "Error",
+    "必须 throws 声明"
+   ],
+   "answer": 0,
+   "explain": "它继承自 RuntimeException，属于‘运行时异常’——编译器不强迫你 try-catch，但一运行就可能送你一个空指针。预防为主（判空）。"
+  },
+  {
+   "id": "e04",
+   "module": "exception",
+   "level": 2,
+   "tags": [
+    "finally"
+   ],
+   "q": "关于 try-catch-finally 中的 finally，正确的是？",
+   "options": [
+    "无论是否异常，finally 一般都会执行",
+    "只在异常时才执行",
+    "try 正常就跳过",
+    "有 return 就不执行"
+   ],
+   "answer": 0,
+   "explain": "finally 是‘铁打的收尾’：不管try成不成功、有没有return，它基本都跑（除非 System.exit 直接关门）。常用来关流、释放资源。"
+  },
+  {
+   "id": "e05",
+   "module": "exception",
+   "level": 2,
+   "tags": [
+    "throw/throws"
+   ],
+   "q": "throw 和 throws 的区别是？",
+   "options": [
+    "throw 抛出一个异常对象，throws 声明方法可能抛什么",
+    "两者完全一样",
+    "throws 在方法体内",
+    "throw 是关键字声明"
+   ],
+   "answer": 0,
+   "explain": "throw 像‘真的把球扔出去’（new 一个异常对象）；throws 像‘门口挂牌：此地可能飞球’，只是声明，不真扔。"
+  },
+  {
+   "id": "e06",
+   "module": "exception",
+   "level": 2,
+   "tags": [
+    "自定义异常"
+   ],
+   "q": "自定义一个业务异常，通常应该继承？",
+   "options": [
+    "Exception（检查异常）或 RuntimeException（运行时）",
+    "Throwable",
+    "Error",
+    "Object"
+   ],
+   "answer": 0,
+   "explain": "想强制调用方处理就继承 Exception（检查异常）；想省事就继承 RuntimeException。别直接继承 Error，那是 JVM 的地盘。"
+  },
+  {
+   "id": "e07",
+   "module": "exception",
+   "level": 1,
+   "tags": [
+    "多异常"
+   ],
+   "q": "Java 7+ 可以用哪种写法一次捕获多种异常？",
+   "options": [
+    "catch (A | B e)",
+    "catch A, B",
+    "catch (A && B)",
+    "多个 catch 合并成一个参数"
+   ],
+   "answer": 0,
+   "explain": "catch (IOException | SQLException e) 一根手指按住两个异常，少写重复代码。注意这种多异常 catch 里的 e 是 final 的，不能重新赋值。"
+  },
+  {
+   "id": "g01",
+   "module": "generic",
+   "level": 2,
+   "tags": [
+    "泛型"
+   ],
+   "q": "使用泛型的主要好处是？",
+   "options": [
+    "编译期类型安全，免去强制类型转换",
+    "让程序跑更快",
+    "减少内存占用",
+    "必须使用接口"
+   ],
+   "answer": 0,
+   "explain": "ArrayList<String> 让编译器帮你盯紧‘只能装字符串’，取出来直接就是 String 不用强转，把 ClassCastException 挡在编译期。"
+  },
+  {
+   "id": "g02",
+   "module": "generic",
+   "level": 3,
+   "tags": [
+    "类型擦除"
+   ],
+   "q": "Java 的‘类型擦除’指的是？",
+   "options": [
+    "编译后泛型信息被擦除，运行时看不到具体类型",
+    "泛型在运行时也保留",
+    "泛型只用于方法",
+    "泛型会让性能下降"
+   ],
+   "answer": 0,
+   "explain": "Java 泛型是‘编译期的化妆’：编译完 List<String> 和 List<Integer> 都变回裸 List，运行时分不清。所以不能用 instanceof List<String> 这种写法。"
+  },
+  {
+   "id": "g03",
+   "module": "generic",
+   "level": 3,
+   "tags": [
+    "通配符"
+   ],
+   "q": "? extends Number 这种通配符表示？",
+   "options": [
+    "上界通配符：只能是 Number 或其子类",
+    "下界通配符",
+    "任意类型",
+    "不能是 Number"
+   ],
+   "answer": 0,
+   "explain": "? extends T 是‘上界’——T 及 T 的子孙都能进；? super T 是‘下界’——T 及 T 的祖宗都能进。PECS 口诀：Producer Extends, Consumer Super。"
+  },
+  {
+   "id": "g04",
+   "module": "generic",
+   "level": 3,
+   "tags": [
+    "反射"
+   ],
+   "q": "反射（Reflection）能在运行时做到？",
+   "options": [
+    "获取类的结构、动态创建对象、调用方法",
+    "只能编译期检查",
+    "修改字节码",
+    "提升运行速度"
+   ],
+   "answer": 0,
+   "explain": "反射像‘X 光机’：运行时也能看清一个类有啥字段/方法，还能绕过 private 去 new 对象、调方法。Spring、框架全靠它，但性能略慢、破坏封装。"
+  },
+  {
+   "id": "g05",
+   "module": "generic",
+   "level": 1,
+   "tags": [
+    "注解"
+   ],
+   "q": "@Override 注解的主要作用是？",
+   "options": [
+    "标记这是重写，让编译器帮你检查签名",
+    "让方法运行更快",
+    "必须写在接口上",
+    "表示废弃"
+   ],
+   "answer": 0,
+   "explain": "@Override 是‘请编译器帮忙核对’：如果你写的方法其实没真正重写父类，编译器立刻报错，避免手滑拼错方法名。"
+  },
+  {
+   "id": "g06",
+   "module": "generic",
+   "level": 2,
+   "tags": [
+    "元注解"
+   ],
+   "q": "像 @Target、@Retention 这类‘注解的注解’叫什么？",
+   "options": [
+    "元注解",
+    "复合注解",
+    "系统注解",
+    "保留注解"
+   ],
+   "answer": 0,
+   "explain": "元注解是‘管注解的注解’：@Target 规定注解能用哪（类/方法/字段），@Retention 规定活到什么时候（源码/类文件/运行时）。自定义注解必备。"
+  },
+  {
+   "id": "g07",
+   "module": "generic",
+   "level": 2,
+   "tags": [
+    "反射"
+   ],
+   "q": "获取一个类的 Class 对象，不正确的是？",
+   "options": [
+    "用 new 关键字直接创建 Class",
+    "类名.class",
+    "对象.getClass()",
+    "Class.forName(\"全限定名\")"
+   ],
+   "answer": 0,
+   "explain": "Class 对象不是 new 出来的。三种正道：类名.class、实例.getClass()、Class.forName(全限定名)（还能顺带加载类）。"
+  },
+  {
+   "id": "t01",
+   "module": "concurrency",
+   "level": 2,
+   "tags": [
+    "创建线程"
+   ],
+   "q": "实现多线程时，为什么通常更推荐实现 Runnable 而不是继承 Thread？",
+   "options": [
+    "Java 单继承，实现 Runnable 更灵活且能资源共享",
+    "Thread 不能用",
+    "Runnable 更快",
+    "继承 Thread 会报错"
+   ],
+   "answer": 0,
+   "explain": "Java 只能单继承，继承了 Thread 就不能再继承别的类。而实现 Runnable（或 Callable）留住了‘继承位’，还能多个线程共用同一个 Runnable 任务。"
+  },
+  {
+   "id": "t02",
+   "module": "concurrency",
+   "level": 2,
+   "tags": [
+    "synchronized"
+   ],
+   "q": "synchronized 关键字的作用是？",
+   "options": [
+    "保证同一时刻只有一个线程进入临界区（互斥锁）",
+    "让线程更快",
+    "自动关闭线程",
+    "创建新线程"
+   ],
+   "answer": 0,
+   "explain": "synchronized 像‘单人洗手间锁’：谁进去了锁上，别人只能等。解决多个线程抢同一份数据时的错乱（线程安全）。"
+  },
+  {
+   "id": "t03",
+   "module": "concurrency",
+   "level": 3,
+   "tags": [
+    "volatile"
+   ],
+   "q": "volatile 关键字能保证什么？",
+   "options": [
+    "可见性（一个线程改了别的线程立刻看到），但不保证原子性",
+    "原子性",
+    "既能见性又原子",
+    "创建线程"
+   ],
+   "answer": 0,
+   "explain": "volatile 保证‘改了马上被别人看见’（可见性），但像 i++ 这种‘读-改-写’三步它管不了原子性。要原子性得上 synchronized 或原子类。"
+  },
+  {
+   "id": "t04",
+   "module": "concurrency",
+   "level": 2,
+   "tags": [
+    "线程池"
+   ],
+   "q": "使用线程池（ExecutorService）的主要好处？",
+   "options": [
+    "复用线程、控制并发数、降低创建销毁开销",
+    "让单线程变快",
+    "自动解决死锁",
+    "不需要 Runnable"
+   ],
+   "answer": 0,
+   "explain": "线程池像‘共享出租车队’：线程用完回收复用，还能限流（别一次开 1 万个线程把机器拖垮）。手动 new Thread 频繁创建销毁太浪费。"
+  },
+  {
+   "id": "t05",
+   "module": "concurrency",
+   "level": 3,
+   "tags": [
+    "死锁"
+   ],
+   "q": "死锁产生的典型条件是？",
+   "options": [
+    "多个线程互相等待对方持有的锁，谁都不放",
+    "单个线程等待",
+    "线程太多",
+    "没用 synchronized"
+   ],
+   "answer": 0,
+   "explain": "死锁像‘两人互相鞠躬让路，都在等对方先起身’：A 拿着锁1等锁2，B 拿着锁2等锁1，永久卡住。预防靠‘统一加锁顺序’等。"
+  },
+  {
+   "id": "t06",
+   "module": "concurrency",
+   "level": 3,
+   "tags": [
+    "原子类"
+   ],
+   "q": "AtomicInteger 这类原子类的核心是？",
+   "options": [
+    "基于 CAS 的无锁原子操作",
+    "基于 synchronized",
+    "基于 volatile",
+    "基于 ThreadLocal"
+   ],
+   "answer": 0,
+   "explain": "原子类靠 CAS（比较并交换）在硬件层面‘无锁’完成自增，既线程安全又比加锁轻量。i++ 不安全的救星。"
+  },
+  {
+   "id": "t07",
+   "module": "concurrency",
+   "level": 2,
+   "tags": [
+    "wait/notify"
+   ],
+   "q": "wait() 和 notify() 必须写在什么环境里？",
+   "options": [
+    "synchronized 同步块/方法内",
+    "任意位置",
+    "static 方法里",
+    "main 方法里"
+   ],
+   "answer": 0,
+   "explain": "wait/notify 是‘对象监视器’的等待-唤醒机制，必须在已获得该对象锁（synchronized）的前提下调用，否则直接抛 IllegalMonitorStateException。"
+  },
+  {
+   "id": "t08",
+   "module": "concurrency",
+   "level": 3,
+   "tags": [
+    "并发容器"
+   ],
+   "q": "ThreadLocal 的用途是？",
+   "options": [
+    "给每个线程一份独立变量副本，避免共享",
+    "让所有线程共享变量",
+    "创建线程池",
+    "加锁"
+   ],
+   "answer": 0,
+   "explain": "ThreadLocal 像‘每人一个私人工位’：存进去的值只有本线程能看到，常用于存用户登录信息、数据库连接，避免到处传参。用完记得 remove 防内存泄漏。"
+  },
+  {
+   "id": "t09",
+   "module": "concurrency",
+   "level": 1,
+   "tags": [
+    "生命周期"
+   ],
+   "q": "线程从创建到结束，不包含以下哪个状态？",
+   "options": [
+    "运行中的‘永久’状态（不存在）",
+    "新建 New",
+    "可运行 Runnable",
+    "终止 Terminated"
+   ],
+   "answer": 0,
+   "explain": "线程状态是 New→Runnable→Running→Blocked/Waiting→Terminated，没有‘永久运行’这种状态，CPU 时间片用完了也会让出。"
+  },
+  {
+   "id": "j01",
+   "module": "jvm",
+   "level": 2,
+   "tags": [
+    "内存区域"
+   ],
+   "q": "Java 中对象实例主要存放在哪里？",
+   "options": [
+    "堆（Heap）",
+    "栈（Stack）",
+    "方法区",
+    "寄存器"
+   ],
+   "answer": 0,
+   "explain": "几乎所有 new 出来的对象都住堆里；栈里只存局部变量和方法调用的‘账本’。这也是为什么堆是 GC 的主战场。"
+  },
+  {
+   "id": "j02",
+   "module": "jvm",
+   "level": 2,
+   "tags": [
+    "内存区域"
+   ],
+   "q": "局部变量、方法参数通常存放在？",
+   "options": [
+    "栈（Stack）",
+    "堆",
+    "方法区",
+    "常量池"
+   ],
+   "answer": 0,
+   "explain": "每个方法调用会开一个‘栈帧’，里面记账本：局部变量、参数都在这儿。方法结束栈帧出栈，变量随之消失，所以局部变量不算 GC 对象。"
+  },
+  {
+   "id": "j03",
+   "module": "jvm",
+   "level": 2,
+   "tags": [
+    "GC"
+   ],
+   "q": "垃圾回收（GC）主要回收什么样的对象？",
+   "options": [
+    "没有任何引用指向的对象",
+    "所有对象",
+    "正在使用的对象",
+    "static 对象"
+   ],
+   "answer": 0,
+   "explain": "GC 是‘保洁阿姨’，专收‘没人要的’——再没有任何变量指着它的对象。判断标准从‘引用计数’进化到了‘可达性分析’。"
+  },
+  {
+   "id": "j04",
+   "module": "jvm",
+   "level": 3,
+   "tags": [
+    "GC算法"
+   ],
+   "q": "常见的垃圾回收算法不包括？",
+   "options": [
+    "快速排序算法（那是排序，不是 GC）",
+    "标记-清除",
+    "复制算法",
+    "分代收集"
+   ],
+   "answer": 0,
+   "explain": "GC 常用：标记-清除、标记-整理、复制、分代收集。快速排序是数据结构里的排序算法，跟回收内存八竿子打不着。"
+  },
+  {
+   "id": "j05",
+   "module": "jvm",
+   "level": 3,
+   "tags": [
+    "类加载"
+   ],
+   "q": "类加载的过程依次是？",
+   "options": [
+    "加载 → 链接（验证/准备/解析）→ 初始化",
+    "编译 → 运行 → 卸载",
+    "new → 使用 → 销毁",
+    "读取 → 执行"
+   ],
+   "answer": 0,
+   "explain": "类从磁盘到能用要过三关：加载（读字节码）→链接（校验、给静态变量备内存、解析符号引用）→初始化（执行 static 代码）。"
+  },
+  {
+   "id": "j06",
+   "module": "jvm",
+   "level": 3,
+   "tags": [
+    "引用"
+   ],
+   "q": "下面哪种引用在 GC 时最‘顽强’，几乎不会被回收？",
+   "options": [
+    "强引用（普通 = 赋值）",
+    "软引用",
+    "弱引用",
+    "虚引用"
+   ],
+   "answer": 0,
+   "explain": "平时写的 Object o = new Object() 是强引用，只要还被强引用指着，GC 绝不动它。软/弱/虚引用则越来越‘好说话’，内存吃紧时先后让位。"
+  },
+  {
+   "id": "j07",
+   "module": "jvm",
+   "level": 3,
+   "tags": [
+    "JMM"
+   ],
+   "q": "Java 内存模型（JMM）主要解决哪三类并发问题？",
+   "options": [
+    "原子性、可见性、有序性",
+    "速度、容量、带宽",
+    "编译、链接、加载",
+    "创建、运行、销毁"
+   ],
+   "answer": 0,
+   "explain": "JMM 是‘并发世界的交通规则’：保证原子性（要么全做要么不做）、可见性（改了别人看得见）、有序性（指令不乱排，靠 happens-before）。"
+  },
+  {
+   "id": "j08",
+   "module": "jvm",
+   "level": 3,
+   "tags": [
+    "类加载"
+   ],
+   "q": "双亲委派模型指的是？",
+   "options": [
+    "类加载器先委托父加载器找，父找不到自己才加载",
+    "子类优先加载",
+    "随机加载",
+    "只用一个加载器"
+   ],
+   "answer": 0,
+   "explain": "类加载像‘先问长辈’：AppClassLoader 先递给父（Ext）再递给 Bootstrap，长辈能加载就直接用，保证核心类不被篡改、不重复加载。"
+  },
+  {
+   "id": "m01",
+   "module": "modern",
+   "level": 2,
+   "tags": [
+    "Lambda"
+   ],
+   "q": "Lambda 表达式的主要作用是？",
+   "options": [
+    "用更简洁的语法写匿名函数，配合函数式接口",
+    "让循环变快",
+    "替代所有类",
+    "创建线程"
+   ],
+   "answer": 0,
+   "explain": "Lambda 像‘把方法写成一句话’：(x) -> x*2。配合只有一个抽象方法的‘函数式接口’使用，少写一堆匿名内部类样板代码。",
+   "code": "list.forEach(s -> System.out.println(s));"
+  },
+  {
+   "id": "m02",
+   "module": "modern",
+   "level": 2,
+   "tags": [
+    "函数式接口"
+   ],
+   "q": "所谓‘函数式接口’是指？",
+   "options": [
+    "只有一个抽象方法的接口（可用 @FunctionalInterface 标记）",
+    "有很多方法的接口",
+    "抽象类",
+    "泛型接口"
+   ],
+   "answer": 0,
+   "explain": "Runnable、Comparator 都是函数式接口——就一个抽象方法，正好能被一个 Lambda‘填’上。@FunctionalInterface 让编译器帮你盯住‘只能一个’。"
+  },
+  {
+   "id": "m03",
+   "module": "modern",
+   "level": 3,
+   "tags": [
+    "Stream"
+   ],
+   "q": "Stream API 中，filter、map、reduce 分别大致对应？",
+   "options": [
+    "过滤 / 转换 / 汇总",
+    "排序 / 分组 / 计数",
+    "读取 / 写入 / 关闭",
+    "创建 / 删除 / 修改"
+   ],
+   "answer": 0,
+   "explain": "filter 像筛子（留符合条件的）；map 像加工厂（把 A 变成 B）；reduce 像打包机（把一堆聚成一个结果）。链式调用写起来行云流水。",
+   "code": "int sum = list.stream().filter(x->x>0).mapToInt(x->x).sum();"
+  },
+  {
+   "id": "m04",
+   "module": "modern",
+   "level": 2,
+   "tags": [
+    "Optional"
+   ],
+   "q": "Optional 类的设计目的是？",
+   "options": [
+    "优雅地避免 NullPointerException，显式处理‘可能为空’",
+    "让对象更快",
+    "替代所有 if",
+    "创建集合"
+   ],
+   "answer": 0,
+   "explain": "Optional 把‘可能没值’这件事写进类型里，逼你用 isPresent()/orElse() 显式处理，而不是到处埋空指针地雷。"
+  },
+  {
+   "id": "m05",
+   "module": "modern",
+   "level": 2,
+   "tags": [
+    "日期API"
+   ],
+   "q": "Java 8 引入的新日期时间 API 中，表示‘日期（无时间）’的是？",
+   "options": [
+    "LocalDate",
+    "Date",
+    "Calendar",
+    "Timestamp"
+   ],
+   "answer": 0,
+   "explain": "老的古董 Date/Calendar 又可变又难用；新 trio：LocalDate（日期）、LocalTime（时间）、LocalDateTime（日期+时间），不可变、线程安全、好用十倍。"
+  },
+  {
+   "id": "m06",
+   "module": "modern",
+   "level": 2,
+   "tags": [
+    "方法引用"
+   ],
+   "q": "双冒号 :: 在 Java 8 中表示？",
+   "options": [
+    "方法引用，直接引用已有方法",
+    "继承",
+    "创建对象",
+    "注释"
+   ],
+   "answer": 0,
+   "explain": "System.out::println 就是‘把 println 这个方法本身当参数传’，是 Lambda 在‘正好调用一个已有方法’时的语法糖，更短更清楚。"
+  },
+  {
+   "id": "m07",
+   "module": "modern",
+   "level": 2,
+   "tags": [
+    "接口默认方法"
+   ],
+   "q": "Java 8 允许接口里写 default 方法，目的是？",
+   "options": [
+    "给接口加默认实现，避免给所有实现类改代码",
+    "让接口能实例化",
+    "替代抽象类",
+    "必须抛出异常"
+   ],
+   "answer": 0,
+   "explain": "以前接口一加方法，所有实现类都得补实现，崩溃。default 方法给个默认实现，老实现类‘无痛升级’，是向函数式演进的过渡设计。"
+  },
+  {
+   "id": "m08",
+   "module": "modern",
+   "level": 3,
+   "tags": [
+    "var"
+   ],
+   "q": "Java 10 引入的 var 用于？",
+   "options": [
+    "局部变量类型推断，写起来更简洁",
+    "定义全局变量",
+    "定义类",
+    "替代泛型"
+   ],
+   "answer": 0,
+   "explain": "var s = \"hi\" 让编译器自己猜类型，少敲键盘。注意：只能用于局部变量、必须初始化，且类型推断不是‘动态类型’——背后还是强类型。"
+  },
+  {
+   "id": "m09",
+   "module": "modern",
+   "level": 3,
+   "tags": [
+    "Record"
+   ],
+   "q": "Java 16 的 Record 主要用于？",
+   "options": [
+    "一行定义不可变数据类（自动有构造/getter/equals/hashCode）",
+    "定义可变集合",
+    "替代接口",
+    "写线程"
+   ],
+   "answer": 0,
+   "explain": "以前写个‘只装数据’的类要手写一堆 getter/equals/hashCode，Record 一行搞定，且默认不可变，是 DTO/值对象的福音。"
+  },
+  {
+   "id": "m10",
+   "module": "modern",
+   "level": 3,
+   "tags": [
+    "虚拟线程"
+   ],
+   "q": "Java 21 的虚拟线程（Virtual Threads）最大的特点是？",
+   "options": [
+    "极轻量，能轻松创建百万级并发，由 JVM 调度",
+    "比普通线程更重",
+    "必须手动管理锁",
+    "替代 GC"
+   ],
+   "answer": 0,
+   "explain": "虚拟线程是‘用户态轻量线程’，由 JVM 而非 OS 调度，创建成本极低，轻松扛住海量并发 I/O，是 Project Loom 的重磅礼物。"
+  },
+  {
+   "id": "i01",
+   "module": "io",
+   "level": 1,
+   "tags": [
+    "流分类"
+   ],
+   "q": "按处理的数据类型，Java 的 IO 流分为？",
+   "options": [
+    "字节流和字符流",
+    "输入流和输出流",
+    "文件流和网络流",
+    "缓冲流和非缓冲流"
+   ],
+   "answer": 0,
+   "explain": "两个维度别混：按‘数据类型’分字节流（8位，啥都能传）和字符流（16位，专门文字）；按‘方向’分输入流和输出流。题目问的是数据类型。"
+  },
+  {
+   "id": "i02",
+   "module": "io",
+   "level": 1,
+   "tags": [
+    "字节流"
+   ],
+   "q": "字节流的两个顶层抽象类是？",
+   "options": [
+    "InputStream 和 OutputStream",
+    "Reader 和 Writer",
+    "File 和 Path",
+    "BufferedReader 和 BufferedWriter"
+   ],
+   "answer": 0,
+   "explain": "InputStream/OutputStream 管‘字节’（图片、视频、任何二进制）；Reader/Writer 管‘字符’（文本）。记清谁是字节谁是字符。"
+  },
+  {
+   "id": "i03",
+   "module": "io",
+   "level": 2,
+   "tags": [
+    "字符流"
+   ],
+   "q": "处理文本读写（按字符）应该用？",
+   "options": [
+    "Reader / Writer 体系",
+    "InputStream / OutputStream",
+    "RandomAccessFile",
+    "Socket"
+   ],
+   "answer": 0,
+   "explain": "读文本用 Reader（如 FileReader），写文本用 Writer（如 FileWriter），它们自动处理字符编码，比字节流拼字符串省心。"
+  },
+  {
+   "id": "i04",
+   "module": "io",
+   "level": 2,
+   "tags": [
+    "缓冲流"
+   ],
+   "q": "BufferedInputStream / BufferedReader 的作用是？",
+   "options": [
+    "加缓冲，减少磁盘/网络 IO 次数，提升效率",
+    "加密数据",
+    "压缩数据",
+    "转换编码"
+   ],
+   "answer": 0,
+   "explain": "缓冲流像‘批发中转站’：攒一批再一次性读写，少跑几趟磁盘，速度明显更快。读大文件记得套一层 Buffered。"
+  },
+  {
+   "id": "i05",
+   "module": "io",
+   "level": 1,
+   "tags": [
+    "File"
+   ],
+   "q": "要对文件/目录做创建、删除、判断存在等操作，用哪个类？",
+   "options": [
+    "File（或 NIO 的 Path/Files）",
+    "InputStream",
+    "BufferedReader",
+    "Socket"
+   ],
+   "answer": 0,
+   "explain": "老派用 File 类（增删改查文件元数据）；Java 7+ 推荐 NIO 的 Path + Files 工具类，方法更丰富更现代。"
+  },
+  {
+   "id": "i06",
+   "module": "io",
+   "level": 3,
+   "tags": [
+    "BIO/NIO"
+   ],
+   "q": "BIO、NIO、AIO 的核心区别是？",
+   "options": [
+    "同步阻塞 / 同步非阻塞（多路复用）/ 异步非阻塞",
+    "都一样",
+    "只是类名不同",
+    "只有速度差异"
+   ],
+   "answer": 0,
+   "explain": "BIO 一人一连接一线程，阻塞等；NIO 用通道+选择器‘一个线程盯多个连接’（多路复用）；AIO 连完成都靠回调通知，彻底异步。高并发选 NIO/AIO。"
+  },
+  {
+   "id": "i07",
+   "module": "io",
+   "level": 2,
+   "tags": [
+    "序列化"
+   ],
+   "q": "要让一个对象能被序列化（存盘/网络传输），需要？",
+   "options": [
+    "实现 Serializable 接口",
+    "加 transient 就行",
+    "继承 Object",
+    "用 synchronized"
+   ],
+   "answer": 0,
+   "explain": "Serializable 是个‘标记接口’，告诉 JVM‘我这个对象可以序列化’。不想被序列化的敏感字段加 transient 关键字即可跳过。"
+  },
+  {
+   "id": "i08",
+   "module": "io",
+   "level": 2,
+   "tags": [
+    "try-with-resources"
+   ],
+   "q": "try-with-resources 语法的主要作用是？",
+   "options": [
+    "自动关闭实现了 AutoCloseable 的资源（流、连接等）",
+    "自动捕获所有异常",
+    "加速 IO",
+    "替代 finally"
+   ],
+   "answer": 0,
+   "explain": "以前关流要写一堆 finally 还容易漏；try (InputStream in = ...) 结束时自动帮你关，避免资源泄漏，代码也更干净。",
+   "code": "try (BufferedReader r = new BufferedReader(new FileReader(f))) {\n   // 用完自动关闭\n}"
+  }
+ ]
+};
+
+/* ===== 每日小灶（趣味知识卡） ===== */
+const LESSONS = [
+ {
+  "id": "l1",
+  "title": "变量：贴了名字的收纳盒",
+  "cat": "基础",
+  "level": 1,
+  "story": "变量就像书桌上贴了标签的收纳盒——标签是变量名，盒子里装的是值。你喊一声标签名，就能拿出里面的东西。改值只是换掉盒里的内容，盒子还是那个盒子。",
+  "code": "int age = 18;          // 贴个\"age\"标签，盒里放数字 18\nString name = \"小明\"; // 贴个\"name\"标签，盒里放文字\nage = 19;              // 换一个值，盒子不变",
+  "tip": "变量名用小驼峰，如 ageOfUser；别用空格或中文当变量名哦。"
+ },
+ {
+  "id": "l2",
+  "title": "数据类型：盒子有不同的形状",
+  "cat": "基础",
+  "level": 1,
+  "story": "int 装整数、double 装小数、boolean 是个开关盒（只能 true/false）、char 装单个字符、String 装一整句文字。你不能用\"整数盒\"装一整段话，就像保鲜盒装不下大西瓜——选对盒子很重要。",
+  "code": "int apples = 3;        // 整数盒\nfloat price = 3.5f;    // 小数盒\nboolean isOpen = true; // 开关盒：真/假\nchar grade = 'A';      // 单个字符盒",
+  "tip": "小数默认是 double，写 float 记得末尾加 f。"
+ },
+ {
+  "id": "l3",
+  "title": "String 不可变：倔强的便签纸",
+  "cat": "基础",
+  "level": 2,
+  "story": "String 像一张写死的便签：你想改内容，它不会在原纸上涂改，而是给你一张新纸写上新内容，旧的扔掉（等垃圾回收）。所以疯狂拼接字符串时，用 StringBuilder 更省纸。",
+  "code": "String s = \"你好\";\ns = s + \"世界\";  // 不是改原纸，而是生成新纸\"你好世界\"",
+  "tip": "循环里大量拼字符串，记得用 StringBuilder，性能更好。"
+ },
+ {
+  "id": "l4",
+  "title": "== 和 equals：认人 vs 认脸",
+  "cat": "基础",
+  "level": 2,
+  "story": "== 问的是\"是不是同一个人\"（比内存地址）；equals 问的是\"长得像不像\"（比内容）。两个人长得很像，但不是同一个人，所以 == 为 false，equals 为 true。",
+  "code": "String a = new String(\"hi\");\nString b = new String(\"hi\");\nSystem.out.println(a == b);       // false：两人\nSystem.out.println(a.equals(b));  // true：长得一样",
+  "tip": "比字符串内容永远用 equals，别用 ==。"
+ },
+ {
+  "id": "l5",
+  "title": "if / else：人生的岔路口",
+  "cat": "流程",
+  "level": 1,
+  "story": "if 是\"如果满足条件，就走这条路\"；else 是\"否则走另一条路\"。程序每天就在这些岔路口做选择。",
+  "code": "int score = 85;\nif (score >= 60) {\n    System.out.println(\"及格啦！\");\n} else {\n    System.out.println(\"再接再厉~\");\n}",
+  "tip": "条件用 == 比较时小心别写成 =（赋值）。"
+ },
+ {
+  "id": "l6",
+  "title": "for 循环：永不疲倦的复读机",
+  "cat": "流程",
+  "level": 1,
+  "story": "for 循环让电脑把同一件事重复 N 遍还不会烦。你只要告诉它：从哪开始、到哪结束、每次迈多大步。",
+  "code": "for (int i = 1; i <= 5; i++) {\n    System.out.println(\"第 \" + i + \" 遍：Java 真香\");\n}",
+  "tip": "i++ 是\"步长 +1\"；for 里定义的 i 只在循环内有效。"
+ },
+ {
+  "id": "l7",
+  "title": "数组：一排编了号的储物柜",
+  "cat": "集合",
+  "level": 2,
+  "story": "数组像一排储物柜，从 0 开始编号。新手最容易绊倒的门槛：第一个柜子是 0 号，不是 1 号！取第 3 个要用下标 2。",
+  "code": "int[] nums = {10, 20, 30};\nSystem.out.println(nums[0]); // 10，注意是 0 号柜！\nSystem.out.println(nums[2]); // 30",
+  "tip": "下标越界（超出长度）会报错 ArrayIndexOutOfBoundsException。"
+ },
+ {
+  "id": "l8",
+  "title": "ArrayList：会伸缩的魔法口袋",
+  "cat": "集合",
+  "level": 2,
+  "story": "普通数组柜子数量固定，ArrayList 是个会自己变大的魔法口袋，想装多少装多少，还能随时加减。",
+  "code": "ArrayList<String> list = new ArrayList<>();\nlist.add(\"Java\");\nlist.add(\"Python\");\nSystem.out.println(list.size()); // 2",
+  "tip": "用 list.get(i) 取元素，用 list.remove(i) 删元素。"
+ },
+ {
+  "id": "l9",
+  "title": "方法：封装好的小机器",
+  "cat": "基础",
+  "level": 2,
+  "story": "方法像一个会干活的小机器：你投进原料（参数），它吐出成品（返回值）。写好一次，随时调用，不用重复造轮子。",
+  "code": "static int add(int a, int b) {\n    return a + b;   // 投进两数，吐出和\n}\n// 调用：add(3, 5) -> 8",
+  "tip": "一个方法只干一件事，名字要见名知意，比如 calculateTotal。"
+ },
+ {
+  "id": "l10",
+  "title": "try-catch：给代码买份保险",
+  "cat": "异常",
+  "level": 2,
+  "story": "try 里放\"可能翻车\"的代码，catch 是备胎方案——真翻车了就走 catch，程序不崩溃，优雅收场。",
+  "code": "try {\n    int r = 10 / 0;        // 会翻车（除以0）\n} catch (Exception e) {\n    System.out.println(\"出错了但不崩\");\n}",
+  "tip": "只 catch 你处理得了的异常，别一刀切吞掉所有错误。"
+ },
+ {
+  "id": "l11",
+  "title": "static：全村共享的老水井",
+  "cat": "面向对象",
+  "level": 3,
+  "story": "普通变量是各家自家的水缸，static 变量是全村共用的老水井——谁都能打，一个人改了大家都看得到。static 方法不用 new 对象就能直接用。",
+  "code": "class Counter {\n    static int count = 0;  // 全村共用的井\n}\nCounter.count++;  // 不用 new，直接打水",
+  "tip": "工具类方法常写成 static，比如 Math.max()。"
+ },
+ {
+  "id": "l12",
+  "title": "继承：青出于蓝",
+  "cat": "面向对象",
+  "level": 3,
+  "story": "子类继承父类，就像孩子继承爸妈的特征，还能自己加新本领。复用代码，少写重复，是面向对象的核心之一。",
+  "code": "class Animal { void eat() { System.out.println(\"吃\"); } }\nclass Cat extends Animal {\n    void meow() { System.out.println(\"喵\"); }\n}",
+  "tip": "Java 是单继承：一个类只能有一个亲爹（父类）。"
+ },
+ {
+  "id": "l13",
+  "title": "多态：同一句\"叫\"，不同表现",
+  "cat": "面向对象",
+  "level": 3,
+  "story": "同样一句\"叫\"，狗是汪汪、猫是喵喵。父类引用指向子类对象，调用同一方法却表现不同——这就是多态，灵活又解耦。",
+  "code": "Animal a = new Cat();\na.eat();  // 实际调用 Cat 的表现",
+  "tip": "面向接口/父类编程，运行时再决定具体行为，这就是多态的魅力。"
+ },
+ {
+  "id": "l14",
+  "title": "HashMap：带编号的储物柜系统",
+  "cat": "集合",
+  "level": 3,
+  "story": "HashMap 像个智能储物柜：你给把\"钥匙\"(key)，它算出柜子编号直接存/取，速度飞快。同一把钥匙只能有一份，重复放会覆盖。",
+  "code": "HashMap<String, Integer> map = new HashMap<>();\nmap.put(\"苹果\", 3);\nSystem.out.println(map.get(\"苹果\")); // 3",
+  "tip": "key 要稳定且重写 equals/hashCode；查找速度是 O(1) 级别。"
+ },
+ {
+  "id": "l15",
+  "title": "垃圾回收 GC：勤快的保洁阿姨",
+  "cat": "JVM",
+  "level": 3,
+  "story": "JVM 里有位保洁阿姨(GC)，专门收拾那些\"没人再引用\"的对象（没被任何变量指着），自动清理释放内存。你基本不用操心，但别不小心一直抱着大对象不放。",
+  "code": "// 没有代码也能懂：\n// 当没有任何变量指向一个对象时\n// GC 会在合适的时候把它收走",
+  "tip": "对象的\"生日\"是 new 的那一刻；\"离职\"是没人引用它的时候。"
+ },
+ {
+  "id": "l16",
+  "title": "接口：签了一份能力合同",
+  "cat": "面向对象",
+  "level": 2,
+  "story": "接口像一份\"能力合同\"：签了就能飞、能跑。一个类能同时签多份合同（多实现），这是 Java 单继承之外的灵活补丁。",
+  "code": "interface Flyable { void fly(); }\nclass Bird implements Flyable {\n    public void fly() { System.out.println(\"扑棱棱~\"); }\n}",
+  "tip": "接口里的方法默认 public abstract；Java 8+ 还能写 default 默认实现。"
+ },
+ {
+  "id": "l17",
+  "title": "Lambda：把方法写成一句话",
+  "cat": "新特性",
+  "level": 2,
+  "story": "Lambda 像把一段逻辑折成一张便签直接递过去：(x) -> x*2。配合函数式接口，少写一堆匿名内部类的样板代码，代码瞬间清爽。",
+  "code": "list.forEach(s -> System.out.println(s));\n// 以前要写匿名内部类，现在一句话",
+  "tip": "Lambda 只能用于‘只有一个抽象方法’的函数式接口。"
+ },
+ {
+  "id": "l18",
+  "title": "Stream：流水线的加工厂",
+  "cat": "新特性",
+  "level": 3,
+  "story": "Stream 像一条全自动流水线：filter 是筛子、map 是加工、reduce 是打包。数据从一头进、成品从另一头出，链式调用写起来特别顺。",
+  "code": "int sum = nums.stream()\n    .filter(x -> x > 0)\n    .mapToInt(x -> x)\n    .sum();",
+  "tip": "Stream 不会改变原集合，它返回的是一条‘新流水线’的结果。"
+ }
 ];
 
 /* ===== 存储 ===== */
-const P = 'wb_java_';
-const K = {checkins:P+'checkins', learned:P+'learned', favs:P+'favs', today:P+'today'};
-function load(k, def){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):def; }catch(e){ return def; } }
-function save(k, v){ localStorage.setItem(k, JSON.stringify(v)); renderSync(); }
-function todayStr(d){ d=d||new Date(); const m=('0'+(d.getMonth()+1)).slice(-2); const day=('0'+d.getDate()).slice(-2); return d.getFullYear()+'-'+m+'-'+day; }
-function dayOfYear(d){ const s=new Date(d.getFullYear(),0,0); return Math.floor((d-s)/86400000); }
-function getCard(id){ return CARDS.find(c=>c.id===id); }
+const P='wb_java_';
+const K={checkins:P+'checkins',learned:P+'learned',favs:P+'favs',today:P+'today',wrong:P+'wrong',done:P+'done',imported:P+'imported'};
+function load(k,def){try{const v=localStorage.getItem(k);return v?JSON.parse(v):def;}catch(e){return def;}}
+function save(k,v){localStorage.setItem(k,JSON.stringify(v));renderSync();}
+function todayStr(d){d=d||new Date();const m=('0'+(d.getMonth()+1)).slice(-2);const day=('0'+d.getDate()).slice(-2);return d.getFullYear()+'-'+m+'-'+day;}
+function dayOfYear(d){const s=new Date(d.getFullYear(),0,0);return Math.floor((d-s)/86400000);}
+function getLesson(id){return LESSONS.find(c=>c.id===id);}
+function getModule(id){return (BANK.modules||[]).find(m=>m.id===id);}
+
+/* ===== 题库加载（联网优先） ===== */
+let BANK = EMBEDDED_BANK;
+const CDN='https://cdn.jsdelivr.net/gh/chenbenkong/java-daily-workspace@main/questions.json';
+const RAW='https://raw.githubusercontent.com/chenbenkong/java-daily-workspace/main/questions.json';
+async function loadBank(){
+  for(const url of [CDN,RAW]){
+    try{
+      const r=await fetch(url,{cache:'no-cache'});
+      if(r.ok){ const j=await r.json(); if(j&&j.questions&&j.questions.length){ BANK=j; setSync('云端题库已同步 · '+j.questions.length+' 题', true); return; } }
+    }catch(e){ /* 继续下一个源 */ }
+  }
+  setSync('离线模式 · 使用内置 '+BANK.questions.length+' 题', false);
+}
+function setSync(text,ok){ const t=document.getElementById('syncText'); if(t)t.textContent=text; const d=document.getElementById('syncDot'); if(d)d.style.background=ok?'#3a9d6b':'#e0a83c'; }
 
 /* ===== 今日卡片 ===== */
-let todayIdx = 0;
+let todayIdx=0;
 function ensureToday(){
-  const t = load(K.today, null);
-  const ts = todayStr();
-  if(t && t.date===ts){ todayIdx = t.idx; }
-  else { todayIdx = dayOfYear(new Date()) % CARDS.length; save(K.today, {date:ts, idx:todayIdx}); }
+  const t=load(K.today,null);const ts=todayStr();
+  if(t&&t.date===ts){todayIdx=t.idx;}else{todayIdx=dayOfYear(new Date())%LESSONS.length;save(K.today,{date:ts,idx:todayIdx});}
 }
 function showTodayCard(){
-  const c = CARDS[todayIdx];
-  document.getElementById('kcCat').textContent = c.cat;
-  document.getElementById('kcTitle').textContent = c.title;
-  document.getElementById('kcLevel').textContent = '难度 ' + '★'.repeat(c.level) + '☆'.repeat(3-c.level);
-  document.getElementById('kcStory').textContent = c.story;
-  document.getElementById('kcCode').textContent = c.code;
-  document.getElementById('kcTip').textContent = c.tip;
-  const favs = load(K.favs, []);
-  const favBtn = document.getElementById('btnFav');
-  const isFav = favs.some(f=>f.cardId===c.id);
-  favBtn.textContent = isFav ? '已收藏 ✓' : '收藏这张';
-  favBtn.className = isFav ? 'btn ghost' : 'btn ghost';
-  favBtn.disabled = isFav;
-  favBtn.style.opacity = isFav ? '.6' : '1';
+  const c=LESSONS[todayIdx];
+  document.getElementById('kcCat').textContent=c.cat;
+  document.getElementById('kcTitle').textContent=c.title;
+  document.getElementById('kcLevel').textContent='难度 '+'★'.repeat(c.level)+'☆'.repeat(3-c.level);
+  document.getElementById('kcStory').textContent=c.story;
+  document.getElementById('kcCode').textContent=c.code;
+  document.getElementById('kcTip').textContent=c.tip;
+  const favs=load(K.favs,[]);const favBtn=document.getElementById('btnFav');
+  const isFav=favs.some(f=>f.cardId===c.id);
+  favBtn.textContent=isFav?'已收藏 ✓':'收藏这张';favBtn.disabled=isFav;favBtn.style.opacity=isFav?'.6':'1';
 }
 
 /* ===== 今天要处理 ===== */
 function renderToday(){
-  const box = document.getElementById('todayBox');
-  const ts = todayStr();
-  const learned = load(K.learned, []);
-  const checkins = load(K.checkins, []);
-  const favs = load(K.favs, []);
-  const items = [];
-  if(!learned.includes(ts)) items.push({type:'learn', text:'今天的 Java 小灶还没吃', badge:'去学习', overdue:false});
-  if(!checkins.includes(ts)) items.push({type:'checkin', text:'今天还没打卡，连续记录要断啦', badge:'去打卡', overdue:false});
-  favs.filter(f=>f.mastery==='unmastered').forEach(f=>{
-    const c = getCard(f.cardId); if(!c) return;
-    const overdue = f.review < ts;
-    items.push({type:'review', cardId:f.cardId, text:'待复习：'+c.title, badge:'去复习', overdue});
-  });
+  const box=document.getElementById('todayBox');const ts=todayStr();
+  const learned=load(K.learned,[]);const checkins=load(K.checkins,[]);const wrong=load(K.wrong,{});
+  const items=[];
+  if(!learned.includes(ts))items.push({type:'learn',text:'今天的 Java 小灶还没吃',badge:'去学习'});
+  if(!checkins.includes(ts))items.push({type:'checkin',text:'今天还没打卡，连续记录要断啦',badge:'去打卡'});
+  const wrongIds=Object.keys(wrong).filter(id=>wrong[id]&&wrong[id].count>0);
+  if(wrongIds.length)items.push({type:'wrong',text:'错题本里有 '+wrongIds.length+' 道待巩固',badge:'去巩固'});
   if(items.length===0){
     box.className='today done';
-    box.innerHTML = '<h2><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>今天都搞定啦，真棒！明天再来一碗 🍲</h2>';
+    box.innerHTML='<h2><svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#3a9d6b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>今天都搞定啦，真棒！明天再来一碗 🍲</h2>';
     return;
   }
-  const hasOverdue = items.some(i=>i.overdue);
-  box.className = 'today' + (hasOverdue?' alert':'');
-  let html = '<h2><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M12 3c1 3-1 4-1 6a3 3 0 0 0 6 0c0-1-.5-2-1-3 2 1 4 3 4 6a7 7 0 1 1-14 0c0-4 3-6 6-9z" stroke="#ea7a2e" stroke-width="1.6" stroke-linejoin="round"/></svg>今天要处理（'+items.length+'）</h2>';
+  box.className='today';
+  let html='<h2><svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 3c1 3-1 4-1 6a3 3 0 0 0 6 0c0-1-.5-2-1-3 2 1 4 3 4 6a7 7 0 1 1-14 0c0-4 3-6 6-9z" stroke="#b5651d" stroke-width="1.6" stroke-linejoin="round"/></svg>今天要处理（'+items.length+'）</h2>';
   items.forEach((it,idx)=>{
-    html += '<div class="titem'+(it.overdue?' overdue':'')+'">'
-      + '<span class="ttext">'+it.text+'</span>'
-      + '<span class="tbadge">'+(it.overdue?'逾期':'待办')+'</span>'
-      + '<button class="btn sm" data-act="'+it.type+'" data-idx="'+idx+'"'+(it.cardId?' data-card="'+it.cardId+'"':'')+'>'+it.badge+'</button>'
-      + '</div>';
+    html+='<div class="titem"><span class="ttext">'+it.text+'</span><button class="btn sm" data-act="'+it.type+'">'+it.badge+'</button></div>';
   });
-  box.innerHTML = html;
-  box.querySelectorAll('[data-act]').forEach(b=>{
-    b.onclick = ()=>{
-      const act = b.getAttribute('data-act');
-      if(act==='learn'){ switchTab('learn'); document.getElementById('panel-learn').scrollIntoView({behavior:'smooth'}); }
-      else if(act==='checkin'){ doCheckin(); }
-      else if(act==='review'){ openCard(b.getAttribute('data-card')); }
-    };
+  box.innerHTML=html;
+  box.querySelectorAll('[data-act]').forEach(b=>b.onclick=()=>{
+    const act=b.getAttribute('data-act');
+    if(act==='learn'){switchTab('learn');}
+    else if(act==='checkin'){doCheckin();}
+    else if(act==='wrong'){switchTab('wrong');}
   });
 }
 
 /* ===== 统计 ===== */
 function calcStreak(checkins){
-  const set = new Set(checkins);
-  let d = new Date();
-  if(!set.has(todayStr(d))) d.setDate(d.getDate()-1);
-  let s=0;
-  while(set.has(todayStr(d))){ s++; d.setDate(d.getDate()-1); }
-  return s;
+  const set=new Set(checkins);let d=new Date();
+  if(!set.has(todayStr(d)))d.setDate(d.getDate()-1);
+  let s=0;while(set.has(todayStr(d))){s++;d.setDate(d.getDate()-1);}return s;
 }
 function renderStats(){
-  const checkins = load(K.checkins, []);
-  const learned = load(K.learned, []);
-  const favs = load(K.favs, []);
-  document.getElementById('stStreak').textContent = calcStreak(checkins);
-  document.getElementById('stTotal').textContent = checkins.length;
-  document.getElementById('stLearn').textContent = learned.length;
-  document.getElementById('stFav').textContent = favs.length;
+  const checkins=load(K.checkins,[]);const done=load(K.done,{});const wrong=load(K.wrong,{});
+  document.getElementById('stStreak').textContent=calcStreak(checkins);
+  document.getElementById('stTotal').textContent=checkins.length;
+  document.getElementById('stDone').textContent=Object.keys(done).length+'/'+BANK.questions.length;
+  const wn=Object.values(wrong).filter(x=>x&&x.count>0).length;
+  document.getElementById('stWrong').textContent=wn;
+  document.getElementById('sideWrong').textContent=wn;
+  document.getElementById('botWrong').textContent=wn;
 }
 
 /* ===== 热力图 ===== */
 function renderHeat(){
-  const checkins = new Set(load(K.checkins, []));
-  const ts = todayStr();
-  const wrap = document.getElementById('heat');
-  wrap.innerHTML='';
-  for(let i=69;i>=0;i--){
-    const d = new Date(); d.setDate(d.getDate()-i);
-    const ds = todayStr(d);
-    const cell = document.createElement('div');
-    cell.className = 'cell' + (checkins.has(ds)?' on':'') + (ds===ts?' today':'');
-    cell.title = ds + (checkins.has(ds)?' 已打卡':'');
-    wrap.appendChild(cell);
-  }
+  const checkins=new Set(load(K.checkins,[]));const ts=todayStr();const wrap=document.getElementById('heat');wrap.innerHTML='';
+  for(let i=69;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const ds=todayStr(d);
+    const cell=document.createElement('div');cell.className='cell'+(checkins.has(ds)?' on':'')+(ds===ts?' today':'');
+    cell.title=ds+(checkins.has(ds)?' 已打卡':'');wrap.appendChild(cell);}
 }
 
 /* ===== 收藏 ===== */
-function renderFavs(){
-  const favs = load(K.favs, []);
-  const list = document.getElementById('favList');
-  list.innerHTML='';
-  if(favs.length===0){ list.innerHTML='<div class="empty">还没有收藏。在「每日小灶」里看到想复习的卡片，点「收藏这张」就好啦～</div>'; return; }
-  const labels = {unmastered:['待复习','u'], reviewing:['复习中','r'], mastered:['已掌握','m']};
-  favs.forEach((f,idx)=>{
-    const c = getCard(f.cardId); if(!c) return;
-    const L = labels[f.mastery]||labels.unmastered;
-    const div = document.createElement('div');
-    div.className='fav';
-    div.innerHTML = '<div class="ft"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M6 4h12a1 1 0 0 1 1 1v15l-7-4-7 4V5a1 1 0 0 1 1-1z" fill="#ea7a2e" stroke="#ea7a2e" stroke-width="1.5" stroke-linejoin="round"/></svg>'+c.title+'</div>'
-      + '<div class="fm">'
-      + '<span class="pill '+L[1]+'">'+L[0]+'</span>'
-      + '<button class="btn ghost sm" data-cycle="'+idx+'">切换状态</button>'
-      + '<button class="btn ghost sm" data-open="'+f.cardId+'">看内容</button>'
-      + '<button class="btn ghost sm" data-del="'+idx+'" style="color:var(--red);border-color:#fca5a5;">删除</button>'
-      + '</div>';
-    list.appendChild(div);
-  });
-  list.querySelectorAll('[data-cycle]').forEach(b=>b.onclick=()=>{
-    const i=+b.getAttribute('data-cycle'); const fs=load(K.favs,[]);
-    const order=['unmastered','reviewing','mastered'];
-    fs[i].mastery = order[(order.indexOf(fs[i].mastery)+1)%3];
-    save(K.favs, fs); renderAll(); toast('状态已更新');
-  });
-  list.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>openCard(b.getAttribute('data-open')));
-  list.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{
-    const i=+b.getAttribute('data-del'); const fs=load(K.favs,[]); fs.splice(i,1);
-    save(K.favs, fs); renderAll(); toast('已删除');
-  });
-}
-
-/* ===== 知识库列表 ===== */
 function renderLib(){
-  document.getElementById('libCount').textContent = CARDS.length;
-  const grid = document.getElementById('libGrid');
-  grid.innerHTML='';
-  CARDS.forEach((c,idx)=>{
-    const favs = load(K.favs, []);
-    const starred = favs.some(f=>f.cardId===c.id);
-    const b = document.createElement('button');
-    b.className='lib-card';
-    b.innerHTML = '<div class="t">'+c.title+'</div>'
-      + '<div class="m"><span>'+c.cat+'</span><span>'+'★'.repeat(c.level)+'</span>'+(starred?'<span class="star">★ 已收藏</span>':'')+'</div>';
-    b.onclick = ()=>{ todayIdx = idx; save(K.today,{date:todayStr(), idx}); showTodayCard(); switchTab('learn'); document.getElementById('panel-learn').scrollIntoView({behavior:'smooth'}); };
+  document.getElementById('libCount').textContent=LESSONS.length;
+  const grid=document.getElementById('libGrid');grid.innerHTML='';
+  LESSONS.forEach((c,idx)=>{
+    const favs=load(K.favs,[]);const starred=favs.some(f=>f.cardId===c.id);
+    const b=document.createElement('button');b.className='lib-card';
+    b.innerHTML='<div class="t">'+c.title+'</div><div class="m"><span>'+c.cat+'</span><span>'+
+      '★'.repeat(c.level)+(starred?'</span><span class="star">★ 已收藏</span>':'')+'</div>';
+    b.onclick=()=>{todayIdx=idx;save(K.today,{date:todayStr(),idx});showTodayCard();switchTab('learn');
+      document.getElementById('panel-learn').scrollIntoView({behavior:'smooth'});};
     grid.appendChild(b);
   });
 }
 
-/* ===== 动作 ===== */
-function doLearn(){
-  const ts=todayStr(); const learned=load(K.learned,[]);
-  if(!learned.includes(ts)){ learned.push(ts); save(K.learned, learned); }
-  toast('搞定！今天的小灶吃啦 🍲');
-  renderAll();
+/* ===== 题库：模块网格 ===== */
+let quizMode='all';
+function moduleStats(){
+  const done=load(K.done,{});
+  const m={};
+  BANK.modules.forEach(mod=>m[mod.id]={total:0,done:0});
+  BANK.questions.forEach(q=>{if(m[q.module]){m[q.module].total++;if(done[q.id])m[q.module].done++;}});
+  return m;
 }
-function doCheckin(){
-  const ts=todayStr(); const ck=load(K.checkins,[]);
-  if(!ck.includes(ts)){ ck.push(ts); save(K.checkins, ck); }
-  toast('打卡成功，连续 '+calcStreak(ck)+' 天 🔥');
-  renderAll();
+function renderModGrid(){
+  const grid=document.getElementById('modGrid');grid.innerHTML='';
+  const st=moduleStats();
+  BANK.modules.forEach(mod=>{
+    const s=st[mod.id]||{total:0,done:0};
+    const pct=s.total?s.done/s.total*100:0;
+    const b=document.createElement('button');b.className='mod-card';
+    b.innerHTML='<div class="emo">'+mod.emoji+'</div><div class="mn">'+mod.name+'</div>'+
+      '<div class="md">'+mod.desc+'</div>'+
+      '<div class="mc">'+s.done+'/'+s.total+' 已练 · '+pct.toFixed(0)+'%</div>'+
+      (pct>=100?'<div class="pr">已通关 ✅</div>':'');
+    b.onclick=()=>startQuiz('module',mod.id);
+    grid.appendChild(b);
+  });
 }
-function doFav(){
-  const c=CARDS[todayIdx]; const favs=load(K.favs,[]);
-  if(favs.some(f=>f.cardId===c.id)){ toast('这张已经收藏过啦'); return; }
-  favs.push({cardId:c.id, mastery:'unmastered', added:todayStr(), review:todayStr()});
-  save(K.favs, favs); showTodayCard(); renderAll(); toast('已收藏，记得复习哦');
+function selectMode(mode){
+  quizMode=mode;
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.toggle('on',b.getAttribute('data-mode')===mode));
 }
-function openCard(id){
-  const c=getCard(id); if(!c) return;
+
+/* ===== 题库：答题逻辑 ===== */
+let qList=[],qPos=0,qRight=0,qWrongIds=[],qStartMode='';
+function pickQuestions(scope,modId){
+  let pool=BANK.questions.slice();
+  if(scope==='module')pool=pool.filter(q=>q.module===modId);
+  else if(scope==='wrong'){const wrong=load(K.wrong,{});pool=pool.filter(q=>wrong[q.id]&&wrong[q.id].count>0);}
+  else if(scope==='weak'){
+    const st=moduleStats();const sorted=BANK.modules.map(m=>({id:m.id,rate:st[m.id].total?st[m.id].done/st[m.id].total:1}))
+      .sort((a,b)=>a.rate-b.rate);
+    const weak=sorted.slice(0,3).map(x=>x.id);
+    pool=pool.filter(q=>weak.includes(q.module));
+  }
+  // 随机打乱
+  for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
+  const N=scope==='wrong'?Math.max(pool.length,1):Math.min(10,pool.length||1);
+  return pool.slice(0,Math.max(1,N));
+}
+function startQuiz(scope,modId){
+  qStartMode=scope+(modId?(':'+modId):'');
+  qList=pickQuestions(scope,modId);
+  if(!qList.length){toast('这个分类暂时没有题目哦');return;}
+  qPos=0;qRight=0;qWrongIds=[];
+  document.getElementById('quizHome').style.display='none';
+  document.getElementById('quizPlay').style.display='block';
+  renderQuestion();
+}
+function renderQuestion(){
+  const box=document.getElementById('quizPlay');
+  if(qPos>=qList.length){renderSummary();return;}
+  const q=qList[qPos];const mod=getModule(q.module);
+  const keys=['A','B','C','D'];
+  let html='<div class="quiz">';
+  html+='<div class="q-meta"><span class="q-tag">'+(mod?mod.emoji+' '+mod.name:'')+'</span>'+
+    '<span class="q-tag">'+q.tags.join(' · ')+'</span>'+
+    '<span class="q-diff" style="color:var(--coffee-d)">难度 '+'★'.repeat(q.level)+'</span>'+
+    '<span style="margin-left:auto">第 '+(qPos+1)+' / '+qList.length+' 题</span></div>';
+  html+='<div class="q-prog"><i style="width:'+(qPos/qList.length*100)+'%"></i></div>';
+  html+='<div class="q-text">'+q.q+'</div>';
+  html+='<div class="opts">';
+  q.options.forEach((o,i)=>{html+='<button class="opt" data-i="'+i+'"><span class="key">'+keys[i]+'</span><span>'+o+'</span></button>';});
+  html+='</div><div id="explainBox"></div>';
+  html+='<div class="q-actions"><button class="btn" id="qNext" style="display:none;">'+(qPos+1<qList.length?'下一题 →':'查看结果')+'</button>'+
+    '<button class="btn ghost tea" id="qQuit">退出</button></div>';
+  html+='</div>';
+  box.innerHTML=html;
+  box.querySelectorAll('.opt').forEach(b=>b.onclick=()=>choose(b.getAttribute('data-i')*1,q));
+  document.getElementById('qNext').onclick=()=>{qPos++;renderQuestion();};
+  document.getElementById('qQuit').onclick=()=>endQuiz();
+}
+function choose(i,q){
+  const opts=document.querySelectorAll('#quizPlay .opt');
+  const correct=q.answer;
+  opts.forEach(o=>{o.onclick=null;const oi=o.getAttribute('data-i')*1;
+    if(oi===correct)o.classList.add('correct');
+    else if(oi===i)o.classList.add('wrong');
+    else o.classList.add('dim');});
+  const right=(i===correct);
+  if(right)qRight++; else qWrongIds.push(q.id);
+  // 记录
+  const done=load(K.done,{});done[q.id]=true;save(K.done,done);
+  const wrong=load(K.wrong,{});
+  if(!wrong[q.id])wrong[q.id]={count:0,last:null};
+  if(right){wrong[q.id].count=Math.max(0,wrong[q.id].count-1);}else{wrong[q.id].count=(wrong[q.id].count||0)+1;wrong[q.id].last=todayStr();}
+  save(K.wrong,wrong);
+  // 解析
+  const eb=document.getElementById('explainBox');
+  eb.innerHTML='<div class="explain"><div class="eh">'+(right?'✅ 答对啦！':'❌ 答错了，看解析')+'</div>'+
+    (q.code?'<pre class="kc-code" style="margin:8px 0">'+escapeHtml(q.code)+'</pre>':'')+
+    '<div>'+q.explain+'</div></div>';
+  document.getElementById('qNext').style.display='inline-flex';
+  renderStats();renderModGrid();
+}
+function renderSummary(){
+  const box=document.getElementById('quizPlay');
+  const rate=qList.length?Math.round(qRight/qList.length*100):0;
+  const color=rate>=80?'var(--green)':rate>=60?'var(--gold)':'var(--red)';
+  let html='<div class="quiz"><div class="quiz-sum">';
+  html+='<div class="big" style="color:'+color+'">'+rate+'%</div>';
+  html+='<div class="rate">本次答对 '+qRight+' / '+qList.length+' 题</div>';
+  html+='<div style="font-size:14px;color:var(--ink-soft);margin-bottom:16px">'+
+    (rate>=90?'太强了，Java 小能手 ☕':rate>=60?'不错，继续夯实薄弱点～':'别急，多翻翻错题本 💪')+'</div>';
+  html+='<div class="q-actions" style="justify-content:center"><button class="btn" id="qAgain">再来一组</button>'+
+    '<button class="btn ghost" id="qBack">返回</button></div>';
+  html+='</div></div>';
+  box.innerHTML=html;
+  document.getElementById('qAgain').onclick=()=>{const parts=qStartMode.split(':');startQuiz(parts[0],parts[1]);};
+  document.getElementById('qBack').onclick=endQuiz;
+}
+function endQuiz(){
+  document.getElementById('quizPlay').style.display='none';
+  document.getElementById('quizHome').style.display='block';
+  renderModGrid();renderStats();renderToday();
+}
+
+/* ===== 错题本 ===== */
+function renderWrong(){
+  const list=document.getElementById('wrongList');const wrong=load(K.wrong,{});
+  const ids=Object.keys(wrong).filter(id=>wrong[id]&&wrong[id].count>0);
+  if(!ids.length){list.innerHTML='<div class="empty"><div class="big">🌱</div>还没有错题，去题库闯关练练吧！<br/>答错的题会自动出现在这里。</div>';return;}
+  list.innerHTML='';
+  ids.forEach(id=>{
+    const q=BANK.questions.find(x=>x.id===id);if(!q)return;const mod=getModule(q.module);
+    const div=document.createElement('div');div.className='wrong-item';
+    div.innerHTML='<div class="wq">'+(mod?mod.emoji:'')+' '+q.q+'</div>'+
+      '<div class="wm"><span class="q-tag">'+(mod?mod.name:'')+'</span><span class="q-tag">答错 '+wrong[id].count+' 次</span>'+
+      '<span class="q-tag">答案：'+['A','B','C','D'][q.answer]+'</span></div>'+
+      '<div class="q-actions"><button class="btn ghost sm" data-show="'+id+'">看解析</button>'+
+      '<button class="btn ghost tea sm" data-master="'+id+'">标记为已掌握</button></div>';
+    list.appendChild(div);
+  });
+  list.querySelectorAll('[data-show]').forEach(b=>b.onclick=()=>{
+    const q=BANK.questions.find(x=>x.id===b.getAttribute('data-show'));
+    showExplain(q);
+  });
+  list.querySelectorAll('[data-master]').forEach(b=>b.onclick=()=>{
+    const id=b.getAttribute('data-master');const w=load(K.wrong,{});if(w[id])w[id].count=0;save(K.wrong,w);
+    toast('已掌握，移除错题本');renderWrong();renderStats();renderToday();
+  });
+}
+function showExplain(q){
   const box=document.getElementById('modalBox');
-  box.innerHTML='<div class="mhead"><strong>'+c.title+'</strong><button id="mClose" class="btn ghost sm">关闭</button></div>'
-    +'<div class="mbody"><span class="kc-cat">'+c.cat+'</span>'
-    +'<div class="kc-story" style="padding:12px 0;">'+c.story+'</div>'
-    +'<pre class="kc-code">'+escapeHtml(c.code)+'</pre>'
-    +'<div class="kc-tip"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z" stroke="#f59e0b" stroke-width="1.7"/><path d="M12 8v4l3 2" stroke="#f59e0b" stroke-width="1.7" stroke-linecap="round"/></svg><span>'+c.tip+'</span></div></div>';
+  box.innerHTML='<div class="mhead"><strong>解析</strong><button id="mClose" class="btn ghost sm">关闭</button></div>'+
+    '<div class="mbody"><div class="q-text" style="font-size:17px">'+q.q+'</div>'+
+    '<div class="q-meta" style="margin:10px 0"><span class="q-tag">正确答案：'+['A','B','C','D'][q.answer]+'</span></div>'+
+    (q.code?'<pre class="kc-code">'+escapeHtml(q.code)+'</pre>':'')+
+    '<div class="explain" style="margin-top:10px"><div class="eh">💡 解析</div><div>'+q.explain+'</div></div></div>';
   document.getElementById('modalMask').classList.add('show');
   document.getElementById('mClose').onclick=closeModal;
 }
-function closeModal(){ document.getElementById('modalMask').classList.remove('show'); }
-function escapeHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+/* ===== 动作 ===== */
+function doLearn(){const ts=todayStr();const learned=load(K.learned,[]);if(!learned.includes(ts)){learned.push(ts);save(K.learned,learned);}toast('搞定！今天的小灶吃啦 🍲');renderAll();}
+function doCheckin(){const ts=todayStr();const ck=load(K.checkins,[]);if(!ck.includes(ts)){ck.push(ts);save(K.checkins,ck);}toast('打卡成功，连续 '+calcStreak(ck)+' 天 🔥');renderAll();}
+function doFav(){const c=LESSONS[todayIdx];const favs=load(K.favs,[]);if(favs.some(f=>f.cardId===c.id)){toast('这张已经收藏过啦');return;}
+  favs.push({cardId:c.id,added:todayStr()});save(K.favs,favs);showTodayCard();renderAll();toast('已收藏，记得复习哦');}
 
 /* ===== 备份 ===== */
 function exportData(){
-  const data={ checkins:load(K.checkins,[]), learned:load(K.learned,[]), favs:load(K.favs,[]) };
+  const data={checkins:load(K.checkins,[]),learned:load(K.learned,[]),favs:load(K.favs,[]),wrong:load(K.wrong,{}),done:load(K.done,{})};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
-  a.download='java-workspace-backup-'+todayStr()+'.json'; a.click();
-  toast('已导出备份');
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='java-workspace-backup-'+todayStr()+'.json';a.click();toast('已导出备份');
 }
 function importData(file){
-  const r=new FileReader();
-  r.onload=()=>{
-    try{
-      const d=JSON.parse(r.result);
-      if(d.checkins) save(K.checkins, d.checkins);
-      if(d.learned) save(K.learned, d.learned);
-      if(d.favs) save(K.favs, d.favs);
-      renderAll(); toast('导入成功，数据已恢复');
-    }catch(e){ toast('文件格式不对，导入失败'); }
-  };
-  r.readAsText(file);
+  const r=new FileReader();r.onload=()=>{
+    try{const d=JSON.parse(r.result);
+      if(d.checkins)save(K.checkins,d.checkins);
+      if(d.learned)save(K.learned,d.learned);
+      if(d.favs)save(K.favs,d.favs);
+      if(d.wrong)save(K.wrong,d.wrong);
+      if(d.done)save(K.done,d.done);
+      renderAll();toast('导入成功，进度已恢复');
+    }catch(e){toast('文件格式不对，导入失败');}
+  };r.readAsText(file);
+}
+/* 导入外部题库（覆盖云端/内置题库） */
+function importBank(file){
+  const r=new FileReader();r.onload=()=>{
+    try{const j=JSON.parse(r.result);
+      if(!j.questions||!j.questions.length)throw 0;
+      if(!j.modules)j.modules=BANK.modules;
+      BANK=j;save(K.imported,true);setSync('已导入自定义题库 · '+j.questions.length+' 题',true);
+      renderModGrid();renderStats();toast('自定义题库已载入 📚');
+    }catch(e){toast('题库格式不对（需含 questions 数组）');}
+  };r.readAsText(file);
 }
 
 /* ===== 示例数据 ===== */
 function seedIfEmpty(){
-  const all = [localStorage.getItem(K.checkins), localStorage.getItem(K.learned), localStorage.getItem(K.favs)];
+  const all=[localStorage.getItem(K.checkins),localStorage.getItem(K.learned)];
   if(all.every(v=>v===null)){
-    const yesterday=new Date(); yesterday.setDate(yesterday.getDate()-1);
-    const old=new Date(); old.setDate(old.getDate()-2);
-    save(K.checkins, [todayStr(yesterday)]);
-    save(K.learned, [todayStr(old)]);
-    save(K.favs, [{cardId:'c4', mastery:'unmastered', added:todayStr(old), review:'2026-08-10'}]);
+    const y=new Date();y.setDate(y.getDate()-1);const o=new Date();o.setDate(o.getDate()-2);
+    save(K.checkins,[todayStr(y)]);save(K.learned,[todayStr(o)]);
   }
-}
-function clearDemo(){
-  if(!confirm('确定清空打卡、学习记录和收藏吗？（内置知识库会保留）')) return;
-  localStorage.removeItem(K.checkins); localStorage.removeItem(K.learned); localStorage.removeItem(K.favs);
-  renderAll(); toast('示例数据已清空');
 }
 
 /* ===== 同步指示 ===== */
-function renderSync(){
-  const el=document.getElementById('syncText');
-  if(el) el.textContent='本地已保存 · '+new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});
-}
+function renderSync(){const el=document.getElementById('syncText');if(el&&!el.dataset.keep)el.textContent='本地已保存 · '+new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});}
 
 /* ===== Tab ===== */
 function switchTab(tab){
-  document.querySelectorAll('.nav-item,.botnav button').forEach(b=>b.classList.toggle('active', b.getAttribute('data-tab')===tab));
+  document.querySelectorAll('.nav-item,.botnav button').forEach(b=>b.classList.toggle('active',b.getAttribute('data-tab')===tab));
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('panel-'+tab).classList.add('active');
+  if(tab==='quiz')renderModGrid();
+  if(tab==='wrong')renderWrong();
 }
 
 /* ===== 渲染总控 ===== */
-function renderAll(){ renderToday(); renderStats(); renderHeat(); renderFavs(); renderLib(); }
+function renderAll(){renderToday();renderStats();renderHeat();renderLib();renderModGrid();}
 
 /* ===== 初始化 ===== */
-seedIfEmpty();
-ensureToday();
-showTodayCard();
-renderAll();
-renderSync();
-
-document.getElementById('btnLearn').onclick=doLearn;
-document.getElementById('btnNext').onclick=()=>{ todayIdx=(todayIdx+1)%CARDS.length; save(K.today,{date:todayStr(),idx:todayIdx}); showTodayCard(); };
-document.getElementById('btnFav').onclick=doFav;
-document.getElementById('btnCheckin').onclick=doCheckin;
-document.getElementById('btnExport').onclick=exportData;
-document.getElementById('btnImport').onclick=()=>document.getElementById('fileInput').click();
-document.getElementById('fileInput').onchange=(e)=>{ if(e.target.files[0]) importData(e.target.files[0]); e.target.value=''; };
-document.getElementById('btnClear').onclick=clearDemo;
-document.getElementById('modalMask').onclick=(e)=>{ if(e.target.id==='modalMask') closeModal(); };
-document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>switchTab(b.getAttribute('data-tab')));
-window.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
+function init(){
+  document.getElementById('quizStatus').textContent='题库共 '+BANK.questions.length+' 题 · 覆盖 '+BANK.modules.length+' 大模块（基础→精通）';
+  seedIfEmpty();ensureToday();showTodayCard();renderAll();renderSync();
+  document.getElementById('btnLearn').onclick=doLearn;
+  document.getElementById('btnNext').onclick=()=>{todayIdx=(todayIdx+1)%LESSONS.length;save(K.today,{date:todayStr(),idx:todayIdx});showTodayCard();};
+  document.getElementById('btnFav').onclick=doFav;
+  document.getElementById('btnCheckin').onclick=doCheckin;
+  document.getElementById('btnExport').onclick=exportData;
+  document.getElementById('btnImport').onclick=()=>document.getElementById('fileInput').click();
+  document.getElementById('fileInput').onchange=(e)=>{const f=e.target.files[0];if(!f)return;
+    if(confirm('导入为【我的进度备份】还是【自定义题库】？\n确定=进度备份，取消=自定义题库'))importData(f);else importBank(f);e.target.value='';};
+  document.getElementById('btnClear')&&(document.getElementById('btnClear').onclick=()=>{});
+  document.getElementById('modalMask').onclick=(e)=>{if(e.target.id==='modalMask')closeModal();};
+  document.querySelectorAll('.mode-btn').forEach(b=>b.onclick=()=>selectMode(b.getAttribute('data-mode')));
+  document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>switchTab(b.getAttribute('data-tab')));
+  window.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+}
+function closeModal(){document.getElementById('modalMask').classList.remove('show');}
+function escapeHtml(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
 let toastTimer;
-function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),1800); }
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),1900);}
+
+loadBank().then(init);
 </script>
 </body>
 </html>
