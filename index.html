@@ -544,10 +544,17 @@ function renderWrong(){
     +'<div style="display:flex;gap:9px;margin-top:12px;"><button class="btn ghost sm" onclick="reStudy(\''+id+'\')">重练这道</button>'
     +'<button class="btn ghost tea sm" onclick="masterWrong(\''+id+'\')">已掌握 ✅</button></div></div>').join('');
 }
-function reStudy(id){const q=BANK.questions.find(q=>q.id===id);if(!q){toast('这道题已经不在题库里了');renderWrong();return;}
+function reStudy(id){
+  const q=BANK.questions.find(q=>q.id===id);
+  if(!q){toast('这道题已经不在题库里了');renderWrong();return;}
   qtTag=modName(q.module);
   qlist=[q];qi=0;qscore=0;qused={};
-  $('quizHome').style.display='none';$('quizPlay').style.display='block';$('qpFinish').style.display='none';showQ();}
+  // 先切到「题库闯关」面板（否则 quizPlay 在隐藏容器里，界面无变化）
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.toggle('active',b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'quiz'")));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  $('panel-quiz').classList.add('active');
+  $('quizHome').style.display='none';$('quizPlay').style.display='block';
+  $('qpFinish').style.display='none';window.scrollTo({top:0,behavior:'smooth'});showQ();}
 function masterWrong(id){const w=load(K.wrong,{});delete w[id];save(K.wrong,w);toast('已掌握，移出错题本 ✅');renderWrong();renderHome();}
 
 /* ---------- 面试速记 ---------- */
