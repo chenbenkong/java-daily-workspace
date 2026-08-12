@@ -6,12 +6,12 @@
 <title>Java 每日小灶 · 风趣 Java 题库</title>
 <style>
   :root{
-    --bg:#0f0c0a;
-    --bg-2:#1a1510;
+    --bg:#f6efe3;
+    --bg-2:#ece1cf;
     --paper:#fffbf4;
     --paper-2:#fdf6e9;
     --ink:#2c2118;
-    --ink-2:#6b5644;
+    --ink-2:#5d4a3a;
     --coffee:#8b5a2b;
     --coffee-light:#b57d4a;
     --coffee-glow:rgba(139,90,43,.22);
@@ -21,10 +21,10 @@
     --accent-2:#21867a;
     --red:#c94a4a;
     --green:#3d9b63;
-    --line:rgba(139,90,43,.12);
-    --glass:rgba(255,251,244,.72);
-    --shadow:0 1px 2px rgba(0,0,0,.06),0 12px 28px rgba(0,0,0,.12);
-    --shadow-lg:0 24px 60px rgba(0,0,0,.22);
+    --line:rgba(139,90,43,.14);
+    --glass:rgba(255,251,244,.80);
+    --shadow:0 1px 2px rgba(0,0,0,.06),0 12px 28px rgba(0,0,0,.10);
+    --shadow-lg:0 24px 60px rgba(0,0,0,.18);
     --serif:"Noto Serif SC","Songti SC","STSong",Georgia,"Times New Roman",serif;
     --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;
   }
@@ -33,8 +33,8 @@
   body{
     font-family:var(--sans);color:var(--ink);font-size:15px;line-height:1.7;
     background:
-      radial-gradient(1200px 600px at 10% -5%, rgba(212,168,75,.10) 0%, transparent 55%),
-      radial-gradient(900px 500px at 110% 0%, rgba(42,157,143,.08) 0%, transparent 50%),
+      radial-gradient(1200px 600px at 10% -5%, rgba(212,168,75,.16) 0%, transparent 55%),
+      radial-gradient(900px 500px at 110% 0%, rgba(42,157,143,.10) 0%, transparent 50%),
       var(--bg);
     background-attachment:fixed;-webkit-font-smoothing:antialiased;min-height:100vh;
   }
@@ -207,7 +207,7 @@
   .empty{text-align:center;color:var(--ink-2);padding:56px 10px;font-size:15px;}
   .empty .big{font-size:52px;margin-bottom:12px;}
 
-  .toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(90px);background:linear-gradient(135deg,var(--ink),var(--bg-2));color:#fff;
+  .toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(90px);background:linear-gradient(135deg,#3a2c1e,#1a1510);color:#fff;
     padding:13px 24px;border-radius:999px;font-size:14.5px;font-weight:800;box-shadow:var(--shadow-lg);
     opacity:0;transition:.28s cubic-bezier(.22,1,.36,1);z-index:99;max-width:90%;text-align:center;border:1px solid rgba(255,255,255,.08);}
   .toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
@@ -288,17 +288,17 @@
       <div class="card-grid">
         <button class="card" onclick="go('quiz')">
           <div class="t">🎯 题库闯关</div>
-          <div class="m">87 道选择题，按模块练、随机刷、错题重练，即时判分看解析。</div>
+          <div class="m" id="qIntro">选择题库加载中…</div>
           <div class="mc">开始刷题 →</div>
         </button>
         <button class="card" onclick="go('interview')">
           <div class="t">🃏 面试速记</div>
-          <div class="m">256 道大厂面试真题改写的风趣速记卡，点开即学，掌握度一目了然。</div>
+          <div class="m" id="ivIntro">面试真题加载中…</div>
           <div class="mc">翻卡片 →</div>
         </button>
         <button class="card" onclick="go('lessons')">
           <div class="t">☕ 每日小灶</div>
-          <div class="m">每天一张风趣知识卡，生活比喻讲透一个 Java 知识点。</div>
+          <div class="m" id="lsIntro">知识卡加载中…</div>
           <div class="mc">来一碗 →</div>
         </button>
         <button class="card" onclick="go('wrong')">
@@ -331,7 +331,7 @@
         <button class="mode-btn" data-qmode="weak" onclick="setQMode('weak')">🎯 薄弱模块</button>
       </div>
       <div id="quizHome">
-        <div class="sub">选一个模块开练，每题即时判分 + 风趣解析 👇</div>
+        <div class="sub" id="qmodeSub">选一个模块开练，每题即时判分 + 风趣解析 👇</div>
         <div class="mod-grid" id="quizModGrid"></div>
       </div>
       <div id="quizPlay" style="display:none;">
@@ -410,6 +410,9 @@ function renderHome(){
   $('stQuiz').textContent=BANK.questions.length;
   $('stIv').textContent=IV.length;
   $('stMaster').textContent=Object.values(iv).filter(s=>s==='y').length;
+  if($('qIntro'))$('qIntro').textContent=BANK.questions.length+' 道选择题，按模块练、随机刷、错题重练，即时判分看解析。';
+  if($('ivIntro'))$('ivIntro').textContent=IV.length+' 道大厂面试真题改写的风趣速记卡，点开即学，掌握度一目了然。';
+  if($('lsIntro'))$('lsIntro').textContent='共 '+LESSONS.length+' 张风趣知识卡，生活比喻讲透一个 Java 知识点，每天一碗。';
 }
 function markLearned(ds){const a=load(K.learned,[]);if(!a.includes(ds)){a.push(ds);save(K.learned,a);}toast('已标记今天学过 ✅');renderHome();renderLesson();}
 
@@ -434,12 +437,15 @@ function renderLesson(){
   $('lcFav').textContent=load(K.favs,[]).length;
 }
 function nextLesson(){li=(li+1)%LESSONS.length;renderLesson();}
-function favLesson(){const f=load(K.favs,[]);if(!f.includes(li)){f.push(li);save(K.favs,f);}toast('已收藏 ⭐');renderLesson();}
-function goQuizLib(){li=0;renderLesson();}
-function goFavLib(){const f=load(K.favs,[]);if(f.length){li=f[0];renderLesson();toast('跳到你收藏的第一张');}else toast('还没有收藏，先去收藏一张吧');}
+function favLesson(){const f=load(K.favs,[]);const has=f.includes(li);
+  if(!has){f.push(li);save(K.favs,f);toast('已收藏 ⭐');}
+  else toast('这张已经收藏过啦 ⭐');renderLesson();}
+function goQuizLib(){li=0;renderLesson();toast('共 '+LESSONS.length+' 张知识卡，从第 1 张逛起 ☕');scrollLesson();}
+function goFavLib(){const f=load(K.favs,[]);if(f.length){li=f[0];renderLesson();toast('跳到收藏的第 1 张 ⭐');scrollLesson();}else toast('还没有收藏，先点卡片上的「收藏」吧');}
+function scrollLesson(){const el=$('lessonBox');if(el&&el.scrollIntoView)el.scrollIntoView({behavior:'smooth',block:'start'});}
 
 /* ---------- 题库闯关 ---------- */
-let qmode='module',qlist=[],qi=0,qscore=0,qused={};
+let qmode='module',qlist=[],qi=0,qscore=0,qused={},qtTag='';
 const QMODS=[['basic','基础语法','🧱'],['oop','面向对象','🏛️'],['string','字符串','🔤'],['collection','集合','🧰'],['exception','异常','🚨'],['reflect','泛型反射注解','🔮'],['concurrency','并发','⚡'],['jvm','JVM','☕'],['modern','新特性','🚀'],['io','IO','📡'],['db','MySQL','🗄️'],['redis','Redis','🧬'],['net','网络','🌐'],['mq','消息队列','📨'],['framework','Spring','🍃'],['arch','系统设计','🏗️'],['design','设计模式','🧩']];
 function renderQuizHome(){
   $('quizPlay').style.display='none';$('quizHome').style.display='block';
@@ -455,22 +461,47 @@ function renderQuizHome(){
     +'<div class="emo">'+m[2]+'</div><div class="mn">'+m[1]+'</div>'
     +'<div class="md">'+n+' 道选择题，覆盖 '+m[1]+'核心考点</div><div class="mc">开练 →</div></button>';}).join('');
   $('nbQuiz').textContent=BANK.questions.length;
+  // 模式提示文案
+  const sub=$('qmodeSub');
+  if(sub){
+    if(qmode==='module')sub.textContent='选一个模块开练，每题即时判分 + 风趣解析 👇';
+    else if(qmode==='random')sub.textContent='🎲 随机闯关：全库混刷，已就绪——点上面任意模块卡或下方按钮开刷';
+    else if(qmode==='wrong')sub.textContent='📕 只刷错题：错题本共 '+Object.keys(wrong).length+' 道，点击模块卡即刷对应模块错题';
+    else sub.textContent='🎯 薄弱模块：按错题数自动挑你最弱的 3 个模块，点击模块卡即刷';
+  }
 }
-function setQMode(m){qmode=m;document.querySelectorAll('[data-qmode]').forEach(x=>x.classList.toggle('active',x.dataset.qmode===m));renderQuizHome();}
+function setQMode(m){
+  qmode=m;
+  document.querySelectorAll('[data-qmode]').forEach(x=>x.classList.toggle('active',x.dataset.qmode===m));
+  if(m==='module'){renderQuizHome();return;}
+  // 非模块模式：直接开刷，无需再点模块卡
+  startQuiz('');
+}
 function startQuiz(mod){
   const wrong=load(K.wrong,{});
   let src=[];
-  if(qmode==='module')src=BANK.questions.filter(q=>q.module===mod);
-  else if(qmode==='wrong')src=BANK.questions.filter(q=>wrong[q.id]);
-  else if(qmode==='weak'){
+  if(qmode==='module'){
+    src=BANK.questions.filter(q=>q.module===mod);
+    qtTag=modName(mod);
+  }else if(qmode==='random'){
+    src=[...BANK.questions];
+    qtTag='随机闯关';
+  }else if(qmode==='wrong'){
+    src=BANK.questions.filter(q=>wrong[q.id]);
+    qtTag='只刷错题';
+  }else if(qmode==='weak'){
     const modErr={};BANK.questions.forEach(q=>{if(wrong[q.id])(modErr[q.module]=(modErr[q.module]||0)+1);});
     const weak=Object.entries(modErr).sort((a,b)=>b[1]-a[1]).slice(0,3).map(e=>e[0]);
     src=BANK.questions.filter(q=>weak.includes(q.module));
+    qtTag='薄弱模块';
   }
-  else src=[...BANK.questions].sort(()=>Math.random()-.5);
-  if((qmode==='wrong'||qmode==='weak'))src=src.filter(q=>wrong[q.id]);
-  if(!src.length){toast('这个范围还没有题哦');return;}
-  if(qmode==='module')src=[...src].sort(()=>Math.random()-.5);
+  if(!src.length){
+    if(qmode==='wrong')toast('错题本是空的，先去刷题积累错题吧 📕');
+    else if(qmode==='weak')toast('还没有错题数据，先刷题攒出薄弱模块 🎯');
+    else toast('这个范围还没有题哦');
+    return;
+  }
+  src=[...src].sort(()=>Math.random()-.5);
   qlist=src;qi=0;qscore=0;qused={};
   $('quizHome').style.display='none';$('quizPlay').style.display='block';
   $('qpFinish').style.display='none';window.scrollTo({top:0,behavior:'smooth'});showQ();
@@ -479,7 +510,7 @@ function showQ(){
   const q=qlist[qi];
   $('qpProg').textContent=(qi+1)+' / '+qlist.length;
   $('qpScore').textContent='✅ '+qscore+' 题';
-  $('qpMeta').innerHTML='<span>'+esc(q.module)+'</span><span>难度 '+('★'.repeat(q.level||1))+'</span>';
+  $('qpMeta').innerHTML='<span>'+esc(qtTag||modName(q.module))+'</span><span>难度 '+('★'.repeat(q.level||1))+'</span>';
   $('qpQ').textContent=q.q;
   $('qpOpts').innerHTML=q.options.map((o,i)=>'<button class="opt" onclick="choose('+i+')"><span class="k">'+'ABCD'[i]+'</span><span>'+o+'</span></button>').join('');
   $('qpExp').className='explain';$('qpExp').innerHTML='';
@@ -498,7 +529,7 @@ function choose(i){
   if(qi<qlist.length-1)$('qpNext').style.display='inline-flex';else $('qpFinish').style.display='inline-flex';
 }
 function nextQ(){qi++;showQ();}
-function finishQuiz(){toast('完成！本次答对 '+qscore+' / '+qlist.length+' 题');renderWrong();renderHome();go('quiz');renderQuizHome();}
+function finishQuiz(){toast('完成！本次答对 '+qscore+' / '+qlist.length+' 题');renderWrong();renderHome();go('quiz');}
 function exitQuiz(){renderQuizHome();}
 
 /* ---------- 错题本 ---------- */
@@ -509,11 +540,12 @@ function renderWrong(){
   $('nbWrong').textContent=n;$('nbWrong').style.display=n?'inline-block':'none';
   if(!n){list.innerHTML='<div class="empty"><div class="big">🎉</div>错题本是空的，去刷题吧</div>';return;}
   list.innerHTML=Object.entries(w).map(([id,x])=>'<div class="wrong-card"><div class="t">'+esc(x.t||id)+'</div>'
-    +'<div class="m">'+esc(x.qm||'')+' · 错于 '+new Date(x.at).toLocaleDateString()+'</div>'
+    +'<div class="m">'+esc(modName(x.qm)||x.qm||'')+' · 错于 '+new Date(x.at).toLocaleDateString()+'</div>'
     +'<div style="display:flex;gap:9px;margin-top:12px;"><button class="btn ghost sm" onclick="reStudy(\''+id+'\')">重练这道</button>'
     +'<button class="btn ghost tea sm" onclick="masterWrong(\''+id+'\')">已掌握 ✅</button></div></div>').join('');
 }
-function reStudy(id){const q=BANK.questions.find(q=>q.id===id);if(!q)return;
+function reStudy(id){const q=BANK.questions.find(q=>q.id===id);if(!q){toast('这道题已经不在题库里了');renderWrong();return;}
+  qtTag=modName(q.module);
   qlist=[q];qi=0;qscore=0;qused={};
   $('quizHome').style.display='none';$('quizPlay').style.display='block';$('qpFinish').style.display='none';showQ();}
 function masterWrong(id){const w=load(K.wrong,{});delete w[id];save(K.wrong,w);toast('已掌握，移出错题本 ✅');renderWrong();renderHome();}
@@ -579,7 +611,7 @@ function importData(ev){
   const r=new FileReader();
   r.onload=()=>{try{const d=JSON.parse(r.result);
     if(d.learned)save(K.learned,d.learned);if(d.favs)save(K.favs,d.favs);if(d.iv)save(K.iv,d.iv);if(d.wrong)save(K.wrong,d.wrong);
-    toast('导入成功 🎉');renderHome();renderIv();renderWrong();}catch(e){toast('导入失败：文件格式不对');}};
+    toast('导入成功 🎉');renderHome();renderIv();renderWrong();renderQuizHome();renderLesson();}catch(e){toast('导入失败：文件格式不对');}};
   r.readAsText(f);ev.target.value='';}
 
 /* ---------- init ---------- */
