@@ -742,10 +742,13 @@ function importData(ev){
   r.readAsText(f);ev.target.value='';}
 
 /* ---------- 数据加载（localStorage 缓存 → jsDelivr CDN → raw 兜底）---------- */
-const DATA_KEY='jv8.data.v1';
+const DATA_KEY='jv9.data.v1';
 const CDN_BASE='https://cdn.jsdelivr.net/gh/chenbenkong/java-daily-workspace@main/';
 const RAW_BASE='https://raw.githubusercontent.com/chenbenkong/java-daily-workspace/main/';
 const LOAD_HTML='<div style="text-align:center;padding:70px 10px;color:var(--ink-2);"><div style="font-size:46px;margin-bottom:14px;">☕</div><div style="font-size:15px;font-weight:800;">Java 每日小灶 · 数据加载中…</div><div style="font-size:13px;margin-top:8px;opacity:.75;">首次加载约 1-3 秒，之后秒开（本地缓存）</div></div>';
+function dataValid(b,l,iv){
+  return b&&b.questions&&b.questions.length>=300 && l&&l.length>=200 && iv&&iv.length>=200;
+}
 async function fetchJSON(url){
   try{const r=await fetch(url,{cache:'no-cache'});if(r.ok)return await r.json();}catch(e){}
   return null;
@@ -755,24 +758,27 @@ async function loadData(){
   try{
     const c=localStorage.getItem(DATA_KEY);
     if(c){const d=JSON.parse(c);
-      if(d&&d.lessons&&d.bank&&d.bank.questions&&d.bank.questions.length&&d.iv&&d.iv.length){applyData(d);return true;}}
+      if(d&&dataValid(d.bank,d.lessons,d.iv)){applyData(d);return true;}}
   }catch(e){}
-  // 2) CDN / raw 并行拉取
+  // 2) CDN 并行拉取（jsDelivr 缓存可能滞后，用数量校验，不达标自动走 raw）
   const [b,l,iv]=await Promise.all([
     fetchJSON(CDN_BASE+'questions.json'),
     fetchJSON(CDN_BASE+'lessons.json'),
     fetchJSON(CDN_BASE+'interview.json')
   ]);
-  if(!(b&&b.questions&&b.questions.length&&l&&l.length&&iv&&iv.length)){
-    const b2=await fetchJSON(RAW_BASE+'questions.json');
-    const l2=await fetchJSON(RAW_BASE+'lessons.json');
-    const iv2=await fetchJSON(RAW_BASE+'interview.json');
-    if(b2&&b2.questions&&b2.questions.length&&l2&&l2.length&&iv2&&iv2.length){
-      const d={bank:b2,lessons:l2,iv:iv2};cacheData(d);applyData(d);return true;
-    }
-    return false;
+  if(dataValid(b,l,iv)){
+    const d={bank:b,lessons:l,iv:iv};cacheData(d);applyData(d);return true;
   }
-  const d={bank:b,lessons:l,iv:iv};cacheData(d);applyData(d);return true;
+  // 3) raw 兜底（实时最新）
+  const [b2,l2,iv2]=await Promise.all([
+    fetchJSON(RAW_BASE+'questions.json'),
+    fetchJSON(RAW_BASE+'lessons.json'),
+    fetchJSON(RAW_BASE+'interview.json')
+  ]);
+  if(dataValid(b2,l2,iv2)){
+    const d={bank:b2,lessons:l2,iv:iv2};cacheData(d);applyData(d);return true;
+  }
+  return false;
 }
 function cacheData(d){
   try{localStorage.setItem(DATA_KEY,JSON.stringify(d));}catch(e){/* 存储满等异常忽略 */}
