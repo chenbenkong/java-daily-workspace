@@ -1,0 +1,596 @@
+<!-- 本工作台通过 WorkBuddy 资料库能力（library skill）搭建、存储和部署 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Java 每日小灶 · 每天学一点</title>
+<style>
+  :root{
+    --bg:#f4f5f7; --card:#ffffff; --primary:#ea7a2e; --primary-d:#d9691c;
+    --accent:#0ea5e9; --text:#1f2937; --muted:#6b7280; --line:#e8e9ec;
+    --red:#ef4444; --green:#22c55e; --amber:#f59e0b; --soft:#fff7ef;
+    --shadow:0 1px 3px rgba(0,0,0,.06),0 6px 18px rgba(0,0,0,.05);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;
+    background:var(--bg); color:var(--text); font-size:15px; line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--accent);text-decoration:none;}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;}
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:6px;
+    min-height:44px;padding:0 16px;border-radius:12px;font-size:15px;font-weight:600;
+    background:var(--primary);color:#fff;box-shadow:var(--shadow);transition:.15s;
+  }
+  .btn:active{transform:scale(.97);}
+  .btn.ghost{background:#fff;color:var(--primary);border:1.5px solid var(--primary);}
+  .btn.amber{background:var(--amber);}
+  .btn.green{background:var(--green);}
+  .btn.sm{min-height:36px;padding:0 12px;font-size:13px;border-radius:10px;}
+  .btn.block{width:100%;}
+  .icon{width:18px;height:18px;flex:none;}
+  .icon-lg{width:26px;height:26px;}
+
+  /* layout */
+  .app{display:flex;min-height:100vh;}
+  .sidebar{
+    width:230px;flex:none;background:var(--card);border-right:1px solid var(--line);
+    padding:20px 14px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:6px;
+  }
+  .brand{display:flex;align-items:center;gap:10px;padding:6px 8px 14px;font-weight:800;font-size:17px;}
+  .brand .logo{width:38px;height:38px;border-radius:11px;background:var(--primary);display:flex;align-items:center;justify-content:center;}
+  .nav-item{
+    display:flex;align-items:center;gap:11px;padding:12px 12px;border-radius:12px;
+    color:var(--muted);font-weight:600;font-size:15px;transition:.12s;width:100%;text-align:left;
+  }
+  .nav-item.active{background:var(--soft);color:var(--primary-d);}
+  .nav-item:active{background:var(--soft);}
+  .side-foot{margin-top:auto;padding:10px 8px 4px;font-size:12px;color:var(--muted);}
+  .main{flex:1;min-width:0;padding:20px 22px 120px;max-width:880px;margin:0 auto;width:100%;}
+
+  /* topbar */
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+  .sync{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);
+    background:#fff;border:1px solid var(--line);padding:7px 11px;border-radius:999px;}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--green);}
+  .tools{display:flex;gap:8px;}
+  .tools .btn.ghost{min-height:38px;padding:0 12px;font-size:13px;}
+
+  /* today */
+  .today{background:linear-gradient(135deg,#fff7ef,#fff);border:1.5px solid #ffd9b8;
+    border-radius:18px;padding:16px 18px;margin-bottom:18px;box-shadow:var(--shadow);}
+  .today.alert{border-color:var(--red);background:linear-gradient(135deg,#fff1f1,#fff);}
+  .today h2{margin:0 0 10px;font-size:16px;display:flex;align-items:center;gap:8px;}
+  .titem{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px dashed var(--line);}
+  .titem:first-of-type{border-top:none;}
+  .titem .ttext{flex:1;font-size:14px;}
+  .titem.overdue .ttext{color:var(--red);font-weight:700;}
+  .titem .tbadge{font-size:11px;padding:2px 8px;border-radius:999px;background:#ffe9da;color:var(--primary-d);font-weight:700;}
+  .titem.overdue .tbadge{background:#ffd9d9;color:var(--red);}
+  .today.done{background:linear-gradient(135deg,#ecfdf3,#fff);border-color:#b7eac6;}
+  .today.done h2{color:var(--green);}
+
+  /* stats */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+  .stat{background:var(--card);border-radius:16px;padding:14px 10px;text-align:center;box-shadow:var(--shadow);}
+  .stat .num{font-size:26px;font-weight:800;color:var(--primary);line-height:1.1;}
+  .stat .lbl{font-size:12px;color:var(--muted);margin-top:4px;}
+
+  /* section */
+  .panel{display:none;animation:fade .25s ease;}
+  .panel.active{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+  .section-title{font-size:15px;font-weight:800;margin:4px 2px 12px;display:flex;align-items:center;gap:8px;}
+
+  /* card */
+  .kc{border-radius:18px;}
+  .kc-head{background:var(--card);border-radius:18px 18px 0 0;padding:18px 18px 14px;box-shadow:var(--shadow);}
+  .kc-cat{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--primary-d);
+    background:var(--soft);padding:4px 10px;border-radius:999px;}
+  .kc-title{font-size:22px;font-weight:800;margin:10px 0 6px;}
+  .kc-level{font-size:12px;color:var(--muted);}
+  .kc-body{background:var(--card);padding:4px 18px 16px;}
+  .kc-story{font-size:15px;color:#374151;padding:12px 0;}
+  .kc-code{background:#1e2530;color:#e6edf3;border-radius:12px;padding:14px 14px;overflow-x:auto;
+    font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;font-size:13px;line-height:1.65;white-space:pre;}
+  .kc-code .c{color:#7ee787;} .kc-code .k{color:#ff7b72;} .kc-code .s{color:#a5d6ff;} .kc-code .cm{color:#8b949e;}
+  .kc-tip{display:flex;gap:9px;align-items:flex-start;background:#fffbeb;border:1px solid #fde68a;
+    border-radius:12px;padding:11px 13px;margin:14px 0 4px;font-size:13.5px;color:#92690a;}
+  .kc-foot{background:var(--card);border-radius:0 0 18px 18px;padding:14px 18px 18px;display:flex;gap:10px;flex-wrap:wrap;box-shadow:var(--shadow);}
+
+  .lib{margin-top:22px;}
+  .lib-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
+  .lib-card{background:var(--card);border-radius:14px;padding:13px 14px;box-shadow:var(--shadow);text-align:left;width:100%;
+    display:flex;flex-direction:column;gap:4px;transition:.12s;}
+  .lib-card:active{transform:scale(.98);}
+  .lib-card .t{font-weight:700;font-size:14.5px;}
+  .lib-card .m{font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center;}
+  .lib-card .star{color:var(--amber);}
+
+  /* checkin */
+  .heat-wrap{background:var(--card);border-radius:18px;padding:18px;box-shadow:var(--shadow);}
+  .heat{display:grid;grid-template-columns:repeat(14,1fr);gap:5px;margin-top:6px;}
+  .cell{aspect-ratio:1/1;border-radius:4px;background:#eef0f3;}
+  .cell.on{background:var(--primary);}
+  .cell.today{outline:2px solid var(--accent);outline-offset:1px;}
+  .heat-legend{display:flex;gap:10px;align-items:center;font-size:12px;color:var(--muted);margin-top:12px;}
+  .heat-legend .cell{width:13px;height:13px;}
+  .checkin-cta{margin-top:16px;}
+
+  /* favs */
+  .fav{border-radius:16px;background:var(--card);padding:14px 15px;box-shadow:var(--shadow);margin-bottom:12px;}
+  .fav .ft{font-weight:700;font-size:15px;display:flex;align-items:center;gap:8px;}
+  .fav .fm{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap;align-items:center;}
+  .pill{font-size:12px;padding:5px 11px;border-radius:999px;font-weight:700;}
+  .pill.u{background:#ffe9da;color:var(--primary-d);}
+  .pill.r{background:#e0f2fe;color:#0369a1;}
+  .pill.m{background:#dcfce7;color:#15803d;}
+  .empty{text-align:center;color:var(--muted);padding:40px 10px;font-size:14px;}
+
+  /* bottom nav (mobile) */
+  .botnav{display:none;}
+  .modal-mask{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;align-items:center;justify-content:center;
+    padding:18px;z-index:50;backdrop-filter:blur(2px);}
+  .modal-mask.show{display:flex;}
+  .modal{background:#fff;border-radius:18px;max-width:560px;width:100%;max-height:88vh;overflow:auto;box-shadow:var(--shadow);}
+  .modal .mhead{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;}
+  .modal .mbody{padding:4px 16px 18px;}
+
+  .toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%) translateY(20px);
+    background:#1f2937;color:#fff;padding:11px 18px;border-radius:999px;font-size:14px;opacity:0;
+    transition:.25s;pointer-events:none;z-index:60;box-shadow:var(--shadow);}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  @media (max-width:860px){
+    .sidebar{display:none;}
+    .main{padding:16px 14px 96px;}
+    .stats{grid-template-columns:repeat(2,1fr);gap:10px;}
+    .lib-grid{grid-template-columns:1fr;}
+    .heat{grid-template-columns:repeat(10,1fr);}
+    .botnav{display:flex;position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);
+      padding:6px 4px calc(6px + env(safe-area-inset-bottom));z-index:40;box-shadow:0 -2px 12px rgba(0,0,0,.06);}
+    .botnav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--muted);font-size:11px;font-weight:600;padding:6px 0;}
+    .botnav button.active{color:var(--primary);}
+    .botnav .icon{width:22px;height:22px;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- PC sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="logo"><svg class="icon-lg" viewBox="0 0 24 24" fill="none"><path d="M5 4h12l-1.2 9.5L18 18l-2 .8-2.6-3.3H8.2L6.2 19l-2-.7L5 4z" fill="#fff"/><path d="M8.4 9.4h6" stroke="#ea7a2e" stroke-width="1.6" stroke-linecap="round"/><path d="M9.6 12.6h5" stroke="#ea7a2e" stroke-width="1.6" stroke-linecap="round"/></svg></span>
+      <span>Java 每日小灶</span>
+    </div>
+    <button class="nav-item active" data-tab="learn"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M4 5.5A2 2 0 0 1 6 4h9a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2V5.5z" stroke="currentColor" stroke-width="1.7"/><path d="M17 6.5c1.3.4 2 1 2 2v9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>每日小灶</button>
+    <button class="nav-item" data-tab="checkin"><svg class="icon" viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="15" rx="2.5" stroke="currentColor" stroke-width="1.7"/><path d="M4 9h16M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M9 14l2 2 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>学习打卡</button>
+    <button class="nav-item" data-tab="fav"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M6 4h12a1 1 0 0 1 1 1v15l-7-4-7 4V5a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>我的收藏</button>
+    <div class="side-foot">本地存储 · 数据在你的浏览器里<br/>记得偶尔导出备份 🔒</div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="sync"><span class="dot"></span><span id="syncText">本地已保存</span></div>
+      <div class="tools">
+        <button class="btn ghost sm" id="btnExport"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M12 3v12m0 0 4-4m-4 4-4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 19h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>导出</button>
+        <button class="btn ghost sm" id="btnImport"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M12 15V3m0 0 4 4m-4-4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 19h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>导入</button>
+      </div>
+      <input type="file" id="fileInput" accept="application/json" style="display:none" />
+    </div>
+
+    <!-- 今天要处理 -->
+    <section class="today" id="todayBox"></section>
+
+    <!-- 统计 -->
+    <div class="stats">
+      <div class="stat"><div class="num" id="stStreak">0</div><div class="lbl">连续打卡</div></div>
+      <div class="stat"><div class="num" id="stTotal">0</div><div class="lbl">累计打卡</div></div>
+      <div class="stat"><div class="num" id="stLearn">0</div><div class="lbl">已学天数</div></div>
+      <div class="stat"><div class="num" id="stFav">0</div><div class="lbl">收藏数</div></div>
+    </div>
+
+    <!-- 模块1 每日小灶 -->
+    <section class="panel active" id="panel-learn">
+      <div class="kc">
+        <div class="kc-head">
+          <span class="kc-cat" id="kcCat">基础</span>
+          <div class="kc-title" id="kcTitle">—</div>
+          <div class="kc-level" id="kcLevel">难度 ★</div>
+        </div>
+        <div class="kc-body">
+          <div class="kc-story" id="kcStory"></div>
+          <pre class="kc-code" id="kcCode"></pre>
+          <div class="kc-tip"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z" stroke="#f59e0b" stroke-width="1.7"/><path d="M12 8v4l3 2" stroke="#f59e0b" stroke-width="1.7" stroke-linecap="round"/></svg><span id="kcTip"></span></div>
+        </div>
+        <div class="kc-foot">
+          <button class="btn" id="btnLearn"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>今天学会了</button>
+          <button class="btn amber" id="btnNext">换一张</button>
+          <button class="btn ghost" id="btnFav">收藏这张</button>
+        </div>
+      </div>
+
+      <div class="lib">
+        <div class="section-title"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>翻翻知识库（共 <span id="libCount">0</span> 道）</div>
+        <div class="lib-grid" id="libGrid"></div>
+      </div>
+    </section>
+
+    <!-- 模块2 学习打卡 -->
+    <section class="panel" id="panel-checkin">
+      <div class="heat-wrap">
+        <div class="section-title" style="margin-bottom:4px;"><svg class="icon" viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="15" rx="2.5" stroke="currentColor" stroke-width="1.7"/><path d="M4 9h16M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>近 70 天打卡热力图</div>
+        <div class="heat" id="heat"></div>
+        <div class="heat-legend"><span class="cell"></span>未打卡 <span class="cell on"></span>已打卡 <span class="cell today"></span>今天</div>
+        <div class="checkin-cta">
+          <button class="btn green block" id="btnCheckin">☕ 今日打卡</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 模块3 我的收藏 -->
+    <section class="panel" id="panel-fav">
+      <div class="section-title"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M6 4h12a1 1 0 0 1 1 1v15l-7-4-7 4V5a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>我的收藏（想复习的卡片）</div>
+      <div id="favList"></div>
+      <div style="margin-top:18px;text-align:center;">
+        <button class="btn ghost sm" id="btnClear">清空示例数据</button>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- mobile bottom nav -->
+<nav class="botnav">
+  <button class="active" data-tab="learn"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M4 5.5A2 2 0 0 1 6 4h9a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2V5.5z" stroke="currentColor" stroke-width="1.7"/><path d="M17 6.5c1.3.4 2 1 2 2v9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>小灶</button>
+  <button data-tab="checkin"><svg class="icon" viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="15" rx="2.5" stroke="currentColor" stroke-width="1.7"/><path d="M4 9h16M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M9 14l2 2 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>打卡</button>
+  <button data-tab="fav"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M6 4h12a1 1 0 0 1 1 1v15l-7-4-7 4V5a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>收藏</button>
+</nav>
+
+<!-- modal -->
+<div class="modal-mask" id="modalMask">
+  <div class="modal" id="modalBox"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===== 知识库（内置内容，不随示例数据清空） ===== */
+const CARDS = [
+  {id:'c1',title:'变量：贴了名字的收纳盒',cat:'基础',level:1,
+   story:'变量就像书桌上贴了标签的收纳盒——标签是变量名，盒子里装的是值。你喊一声标签名，就能拿出里面的东西。改值只是换掉盒里的内容，盒子还是那个盒子。',
+   code:'int age = 18;          // 贴个"age"标签，盒里放数字 18\nString name = "小明"; // 贴个"name"标签，盒里放文字\nage = 19;              // 换一个值，盒子不变',
+   tip:'变量名用小驼峰，如 ageOfUser；别用空格或中文当变量名哦。'},
+  {id:'c2',title:'数据类型：盒子有不同的形状',cat:'基础',level:1,
+   story:'int 装整数、double 装小数、boolean 是个开关盒（只能 true/false）、char 装单个字符、String 装一整句文字。你不能用"整数盒"装一整段话，就像保鲜盒装不下大西瓜——选对盒子很重要。',
+   code:'int apples = 3;        // 整数盒\nfloat price = 3.5f;    // 小数盒\nboolean isOpen = true; // 开关盒：真/假\nchar grade = \'A\';      // 单个字符盒',
+   tip:'小数默认是 double，写 float 记得末尾加 f。'},
+  {id:'c3',title:'String 不可变：倔强的便签纸',cat:'基础',level:2,
+   story:'String 像一张写死的便签：你想改内容，它不会在原纸上涂改，而是给你一张新纸写上新内容，旧的扔掉（等垃圾回收）。所以疯狂拼接字符串时，用 StringBuilder 更省纸。',
+   code:'String s = "你好";\ns = s + "世界";  // 不是改原纸，而是生成新纸"你好世界"',
+   tip:'循环里大量拼字符串，记得用 StringBuilder，性能更好。'},
+  {id:'c4',title:'== 和 equals：认人 vs 认脸',cat:'基础',level:2,
+   story:'== 问的是"是不是同一个人"（比内存地址）；equals 问的是"长得像不像"（比内容）。两个人长得很像，但不是同一个人，所以 == 为 false，equals 为 true。',
+   code:'String a = new String("hi");\nString b = new String("hi");\nSystem.out.println(a == b);       // false：两人\nSystem.out.println(a.equals(b));  // true：长得一样',
+   tip:'比字符串内容永远用 equals，别用 ==。'},
+  {id:'c5',title:'if / else：人生的岔路口',cat:'流程',level:1,
+   story:'if 是"如果满足条件，就走这条路"；else 是"否则走另一条路"。程序每天就在这些岔路口做选择。',
+   code:'int score = 85;\nif (score >= 60) {\n    System.out.println("及格啦！");\n} else {\n    System.out.println("再接再厉~");\n}',
+   tip:'条件用 == 比较时小心别写成 =（赋值）。'},
+  {id:'c6',title:'for 循环：永不疲倦的复读机',cat:'流程',level:1,
+   story:'for 循环让电脑把同一件事重复 N 遍还不会烦。你只要告诉它：从哪开始、到哪结束、每次迈多大步。',
+   code:'for (int i = 1; i <= 5; i++) {\n    System.out.println("第 " + i + " 遍：Java 真香");\n}',
+   tip:'i++ 是"步长 +1"；for 里定义的 i 只在循环内有效。'},
+  {id:'c7',title:'数组：一排编了号的储物柜',cat:'集合',level:2,
+   story:'数组像一排储物柜，从 0 开始编号。新手最容易绊倒的门槛：第一个柜子是 0 号，不是 1 号！取第 3 个要用下标 2。',
+   code:'int[] nums = {10, 20, 30};\nSystem.out.println(nums[0]); // 10，注意是 0 号柜！\nSystem.out.println(nums[2]); // 30',
+   tip:'下标越界（超出长度）会报错 ArrayIndexOutOfBoundsException。'},
+  {id:'c8',title:'ArrayList：会伸缩的魔法口袋',cat:'集合',level:2,
+   story:'普通数组柜子数量固定，ArrayList 是个会自己变大的魔法口袋，想装多少装多少，还能随时加减。',
+   code:'ArrayList<String> list = new ArrayList<>();\nlist.add("Java");\nlist.add("Python");\nSystem.out.println(list.size()); // 2',
+   tip:'用 list.get(i) 取元素，用 list.remove(i) 删元素。'},
+  {id:'c9',title:'方法：封装好的小机器',cat:'基础',level:2,
+   story:'方法像一个会干活的小机器：你投进原料（参数），它吐出成品（返回值）。写好一次，随时调用，不用重复造轮子。',
+   code:'static int add(int a, int b) {\n    return a + b;   // 投进两数，吐出和\n}\n// 调用：add(3, 5) -> 8',
+   tip:'一个方法只干一件事，名字要见名知意，比如 calculateTotal。'},
+  {id:'c10',title:'try-catch：给代码买份保险',cat:'异常',level:2,
+   story:'try 里放"可能翻车"的代码，catch 是备胎方案——真翻车了就走 catch，程序不崩溃，优雅收场。',
+   code:'try {\n    int r = 10 / 0;        // 会翻车（除以0）\n} catch (Exception e) {\n    System.out.println("出错了但不崩");\n}',
+   tip:'只 catch 你处理得了的异常，别一刀切吞掉所有错误。'},
+  {id:'c11',title:'static：全村共享的老水井',cat:'面向对象',level:3,
+   story:'普通变量是各家自家的水缸，static 变量是全村共用的老水井——谁都能打，一个人改了大家都看得到。static 方法不用 new 对象就能直接用。',
+   code:'class Counter {\n    static int count = 0;  // 全村共用的井\n}\nCounter.count++;  // 不用 new，直接打水',
+   tip:'工具类方法常写成 static，比如 Math.max()。'},
+  {id:'c12',title:'继承：青出于蓝',cat:'面向对象',level:3,
+   story:'子类继承父类，就像孩子继承爸妈的特征，还能自己加新本领。复用代码，少写重复，是面向对象的核心之一。',
+   code:'class Animal { void eat() { System.out.println("吃"); } }\nclass Cat extends Animal {\n    void meow() { System.out.println("喵"); }\n}',
+   tip:'Java 是单继承：一个类只能有一个亲爹（父类）。'},
+  {id:'c13',title:'多态：同一句"叫"，不同表现',cat:'面向对象',level:3,
+   story:'同样一句"叫"，狗是汪汪、猫是喵喵。父类引用指向子类对象，调用同一方法却表现不同——这就是多态，灵活又解耦。',
+   code:'Animal a = new Cat();\na.eat();  // 实际调用 Cat 的表现',
+   tip:'面向接口/父类编程，运行时再决定具体行为，这就是多态的魅力。'},
+  {id:'c14',title:'HashMap：带编号的储物柜系统',cat:'集合',level:3,
+   story:'HashMap 像个智能储物柜：你给把"钥匙"(key)，它算出柜子编号直接存/取，速度飞快。同一把钥匙只能有一份，重复放会覆盖。',
+   code:'HashMap<String, Integer> map = new HashMap<>();\nmap.put("苹果", 3);\nSystem.out.println(map.get("苹果")); // 3',
+   tip:'key 要稳定且重写 equals/hashCode；查找速度是 O(1) 级别。'},
+  {id:'c15',title:'垃圾回收 GC：勤快的保洁阿姨',cat:'JVM',level:3,
+   story:'JVM 里有位保洁阿姨(GC)，专门收拾那些"没人再引用"的对象（没被任何变量指着），自动清理释放内存。你基本不用操心，但别不小心一直抱着大对象不放。',
+   code:'// 没有代码也能懂：\n// 当没有任何变量指向一个对象时\n// GC 会在合适的时候把它收走',
+   tip:'对象的"生日"是 new 的那一刻；"离职"是没人引用它的时候。'}
+];
+
+/* ===== 存储 ===== */
+const P = 'wb_java_';
+const K = {checkins:P+'checkins', learned:P+'learned', favs:P+'favs', today:P+'today'};
+function load(k, def){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):def; }catch(e){ return def; } }
+function save(k, v){ localStorage.setItem(k, JSON.stringify(v)); renderSync(); }
+function todayStr(d){ d=d||new Date(); const m=('0'+(d.getMonth()+1)).slice(-2); const day=('0'+d.getDate()).slice(-2); return d.getFullYear()+'-'+m+'-'+day; }
+function dayOfYear(d){ const s=new Date(d.getFullYear(),0,0); return Math.floor((d-s)/86400000); }
+function getCard(id){ return CARDS.find(c=>c.id===id); }
+
+/* ===== 今日卡片 ===== */
+let todayIdx = 0;
+function ensureToday(){
+  const t = load(K.today, null);
+  const ts = todayStr();
+  if(t && t.date===ts){ todayIdx = t.idx; }
+  else { todayIdx = dayOfYear(new Date()) % CARDS.length; save(K.today, {date:ts, idx:todayIdx}); }
+}
+function showTodayCard(){
+  const c = CARDS[todayIdx];
+  document.getElementById('kcCat').textContent = c.cat;
+  document.getElementById('kcTitle').textContent = c.title;
+  document.getElementById('kcLevel').textContent = '难度 ' + '★'.repeat(c.level) + '☆'.repeat(3-c.level);
+  document.getElementById('kcStory').textContent = c.story;
+  document.getElementById('kcCode').textContent = c.code;
+  document.getElementById('kcTip').textContent = c.tip;
+  const favs = load(K.favs, []);
+  const favBtn = document.getElementById('btnFav');
+  const isFav = favs.some(f=>f.cardId===c.id);
+  favBtn.textContent = isFav ? '已收藏 ✓' : '收藏这张';
+  favBtn.className = isFav ? 'btn ghost' : 'btn ghost';
+  favBtn.disabled = isFav;
+  favBtn.style.opacity = isFav ? '.6' : '1';
+}
+
+/* ===== 今天要处理 ===== */
+function renderToday(){
+  const box = document.getElementById('todayBox');
+  const ts = todayStr();
+  const learned = load(K.learned, []);
+  const checkins = load(K.checkins, []);
+  const favs = load(K.favs, []);
+  const items = [];
+  if(!learned.includes(ts)) items.push({type:'learn', text:'今天的 Java 小灶还没吃', badge:'去学习', overdue:false});
+  if(!checkins.includes(ts)) items.push({type:'checkin', text:'今天还没打卡，连续记录要断啦', badge:'去打卡', overdue:false});
+  favs.filter(f=>f.mastery==='unmastered').forEach(f=>{
+    const c = getCard(f.cardId); if(!c) return;
+    const overdue = f.review < ts;
+    items.push({type:'review', cardId:f.cardId, text:'待复习：'+c.title, badge:'去复习', overdue});
+  });
+  if(items.length===0){
+    box.className='today done';
+    box.innerHTML = '<h2><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>今天都搞定啦，真棒！明天再来一碗 🍲</h2>';
+    return;
+  }
+  const hasOverdue = items.some(i=>i.overdue);
+  box.className = 'today' + (hasOverdue?' alert':'');
+  let html = '<h2><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M12 3c1 3-1 4-1 6a3 3 0 0 0 6 0c0-1-.5-2-1-3 2 1 4 3 4 6a7 7 0 1 1-14 0c0-4 3-6 6-9z" stroke="#ea7a2e" stroke-width="1.6" stroke-linejoin="round"/></svg>今天要处理（'+items.length+'）</h2>';
+  items.forEach((it,idx)=>{
+    html += '<div class="titem'+(it.overdue?' overdue':'')+'">'
+      + '<span class="ttext">'+it.text+'</span>'
+      + '<span class="tbadge">'+(it.overdue?'逾期':'待办')+'</span>'
+      + '<button class="btn sm" data-act="'+it.type+'" data-idx="'+idx+'"'+(it.cardId?' data-card="'+it.cardId+'"':'')+'>'+it.badge+'</button>'
+      + '</div>';
+  });
+  box.innerHTML = html;
+  box.querySelectorAll('[data-act]').forEach(b=>{
+    b.onclick = ()=>{
+      const act = b.getAttribute('data-act');
+      if(act==='learn'){ switchTab('learn'); document.getElementById('panel-learn').scrollIntoView({behavior:'smooth'}); }
+      else if(act==='checkin'){ doCheckin(); }
+      else if(act==='review'){ openCard(b.getAttribute('data-card')); }
+    };
+  });
+}
+
+/* ===== 统计 ===== */
+function calcStreak(checkins){
+  const set = new Set(checkins);
+  let d = new Date();
+  if(!set.has(todayStr(d))) d.setDate(d.getDate()-1);
+  let s=0;
+  while(set.has(todayStr(d))){ s++; d.setDate(d.getDate()-1); }
+  return s;
+}
+function renderStats(){
+  const checkins = load(K.checkins, []);
+  const learned = load(K.learned, []);
+  const favs = load(K.favs, []);
+  document.getElementById('stStreak').textContent = calcStreak(checkins);
+  document.getElementById('stTotal').textContent = checkins.length;
+  document.getElementById('stLearn').textContent = learned.length;
+  document.getElementById('stFav').textContent = favs.length;
+}
+
+/* ===== 热力图 ===== */
+function renderHeat(){
+  const checkins = new Set(load(K.checkins, []));
+  const ts = todayStr();
+  const wrap = document.getElementById('heat');
+  wrap.innerHTML='';
+  for(let i=69;i>=0;i--){
+    const d = new Date(); d.setDate(d.getDate()-i);
+    const ds = todayStr(d);
+    const cell = document.createElement('div');
+    cell.className = 'cell' + (checkins.has(ds)?' on':'') + (ds===ts?' today':'');
+    cell.title = ds + (checkins.has(ds)?' 已打卡':'');
+    wrap.appendChild(cell);
+  }
+}
+
+/* ===== 收藏 ===== */
+function renderFavs(){
+  const favs = load(K.favs, []);
+  const list = document.getElementById('favList');
+  list.innerHTML='';
+  if(favs.length===0){ list.innerHTML='<div class="empty">还没有收藏。在「每日小灶」里看到想复习的卡片，点「收藏这张」就好啦～</div>'; return; }
+  const labels = {unmastered:['待复习','u'], reviewing:['复习中','r'], mastered:['已掌握','m']};
+  favs.forEach((f,idx)=>{
+    const c = getCard(f.cardId); if(!c) return;
+    const L = labels[f.mastery]||labels.unmastered;
+    const div = document.createElement('div');
+    div.className='fav';
+    div.innerHTML = '<div class="ft"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M6 4h12a1 1 0 0 1 1 1v15l-7-4-7 4V5a1 1 0 0 1 1-1z" fill="#ea7a2e" stroke="#ea7a2e" stroke-width="1.5" stroke-linejoin="round"/></svg>'+c.title+'</div>'
+      + '<div class="fm">'
+      + '<span class="pill '+L[1]+'">'+L[0]+'</span>'
+      + '<button class="btn ghost sm" data-cycle="'+idx+'">切换状态</button>'
+      + '<button class="btn ghost sm" data-open="'+f.cardId+'">看内容</button>'
+      + '<button class="btn ghost sm" data-del="'+idx+'" style="color:var(--red);border-color:#fca5a5;">删除</button>'
+      + '</div>';
+    list.appendChild(div);
+  });
+  list.querySelectorAll('[data-cycle]').forEach(b=>b.onclick=()=>{
+    const i=+b.getAttribute('data-cycle'); const fs=load(K.favs,[]);
+    const order=['unmastered','reviewing','mastered'];
+    fs[i].mastery = order[(order.indexOf(fs[i].mastery)+1)%3];
+    save(K.favs, fs); renderAll(); toast('状态已更新');
+  });
+  list.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>openCard(b.getAttribute('data-open')));
+  list.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{
+    const i=+b.getAttribute('data-del'); const fs=load(K.favs,[]); fs.splice(i,1);
+    save(K.favs, fs); renderAll(); toast('已删除');
+  });
+}
+
+/* ===== 知识库列表 ===== */
+function renderLib(){
+  document.getElementById('libCount').textContent = CARDS.length;
+  const grid = document.getElementById('libGrid');
+  grid.innerHTML='';
+  CARDS.forEach((c,idx)=>{
+    const favs = load(K.favs, []);
+    const starred = favs.some(f=>f.cardId===c.id);
+    const b = document.createElement('button');
+    b.className='lib-card';
+    b.innerHTML = '<div class="t">'+c.title+'</div>'
+      + '<div class="m"><span>'+c.cat+'</span><span>'+'★'.repeat(c.level)+'</span>'+(starred?'<span class="star">★ 已收藏</span>':'')+'</div>';
+    b.onclick = ()=>{ todayIdx = idx; save(K.today,{date:todayStr(), idx}); showTodayCard(); switchTab('learn'); document.getElementById('panel-learn').scrollIntoView({behavior:'smooth'}); };
+    grid.appendChild(b);
+  });
+}
+
+/* ===== 动作 ===== */
+function doLearn(){
+  const ts=todayStr(); const learned=load(K.learned,[]);
+  if(!learned.includes(ts)){ learned.push(ts); save(K.learned, learned); }
+  toast('搞定！今天的小灶吃啦 🍲');
+  renderAll();
+}
+function doCheckin(){
+  const ts=todayStr(); const ck=load(K.checkins,[]);
+  if(!ck.includes(ts)){ ck.push(ts); save(K.checkins, ck); }
+  toast('打卡成功，连续 '+calcStreak(ck)+' 天 🔥');
+  renderAll();
+}
+function doFav(){
+  const c=CARDS[todayIdx]; const favs=load(K.favs,[]);
+  if(favs.some(f=>f.cardId===c.id)){ toast('这张已经收藏过啦'); return; }
+  favs.push({cardId:c.id, mastery:'unmastered', added:todayStr(), review:todayStr()});
+  save(K.favs, favs); showTodayCard(); renderAll(); toast('已收藏，记得复习哦');
+}
+function openCard(id){
+  const c=getCard(id); if(!c) return;
+  const box=document.getElementById('modalBox');
+  box.innerHTML='<div class="mhead"><strong>'+c.title+'</strong><button id="mClose" class="btn ghost sm">关闭</button></div>'
+    +'<div class="mbody"><span class="kc-cat">'+c.cat+'</span>'
+    +'<div class="kc-story" style="padding:12px 0;">'+c.story+'</div>'
+    +'<pre class="kc-code">'+escapeHtml(c.code)+'</pre>'
+    +'<div class="kc-tip"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z" stroke="#f59e0b" stroke-width="1.7"/><path d="M12 8v4l3 2" stroke="#f59e0b" stroke-width="1.7" stroke-linecap="round"/></svg><span>'+c.tip+'</span></div></div>';
+  document.getElementById('modalMask').classList.add('show');
+  document.getElementById('mClose').onclick=closeModal;
+}
+function closeModal(){ document.getElementById('modalMask').classList.remove('show'); }
+function escapeHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+/* ===== 备份 ===== */
+function exportData(){
+  const data={ checkins:load(K.checkins,[]), learned:load(K.learned,[]), favs:load(K.favs,[]) };
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='java-workspace-backup-'+todayStr()+'.json'; a.click();
+  toast('已导出备份');
+}
+function importData(file){
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const d=JSON.parse(r.result);
+      if(d.checkins) save(K.checkins, d.checkins);
+      if(d.learned) save(K.learned, d.learned);
+      if(d.favs) save(K.favs, d.favs);
+      renderAll(); toast('导入成功，数据已恢复');
+    }catch(e){ toast('文件格式不对，导入失败'); }
+  };
+  r.readAsText(file);
+}
+
+/* ===== 示例数据 ===== */
+function seedIfEmpty(){
+  const all = [localStorage.getItem(K.checkins), localStorage.getItem(K.learned), localStorage.getItem(K.favs)];
+  if(all.every(v=>v===null)){
+    const yesterday=new Date(); yesterday.setDate(yesterday.getDate()-1);
+    const old=new Date(); old.setDate(old.getDate()-2);
+    save(K.checkins, [todayStr(yesterday)]);
+    save(K.learned, [todayStr(old)]);
+    save(K.favs, [{cardId:'c4', mastery:'unmastered', added:todayStr(old), review:'2026-08-10'}]);
+  }
+}
+function clearDemo(){
+  if(!confirm('确定清空打卡、学习记录和收藏吗？（内置知识库会保留）')) return;
+  localStorage.removeItem(K.checkins); localStorage.removeItem(K.learned); localStorage.removeItem(K.favs);
+  renderAll(); toast('示例数据已清空');
+}
+
+/* ===== 同步指示 ===== */
+function renderSync(){
+  const el=document.getElementById('syncText');
+  if(el) el.textContent='本地已保存 · '+new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});
+}
+
+/* ===== Tab ===== */
+function switchTab(tab){
+  document.querySelectorAll('.nav-item,.botnav button').forEach(b=>b.classList.toggle('active', b.getAttribute('data-tab')===tab));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+tab).classList.add('active');
+}
+
+/* ===== 渲染总控 ===== */
+function renderAll(){ renderToday(); renderStats(); renderHeat(); renderFavs(); renderLib(); }
+
+/* ===== 初始化 ===== */
+seedIfEmpty();
+ensureToday();
+showTodayCard();
+renderAll();
+renderSync();
+
+document.getElementById('btnLearn').onclick=doLearn;
+document.getElementById('btnNext').onclick=()=>{ todayIdx=(todayIdx+1)%CARDS.length; save(K.today,{date:todayStr(),idx:todayIdx}); showTodayCard(); };
+document.getElementById('btnFav').onclick=doFav;
+document.getElementById('btnCheckin').onclick=doCheckin;
+document.getElementById('btnExport').onclick=exportData;
+document.getElementById('btnImport').onclick=()=>document.getElementById('fileInput').click();
+document.getElementById('fileInput').onchange=(e)=>{ if(e.target.files[0]) importData(e.target.files[0]); e.target.value=''; };
+document.getElementById('btnClear').onclick=clearDemo;
+document.getElementById('modalMask').onclick=(e)=>{ if(e.target.id==='modalMask') closeModal(); };
+document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>switchTab(b.getAttribute('data-tab')));
+window.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
+
+let toastTimer;
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),1800); }
+</script>
+</body>
+</html>
