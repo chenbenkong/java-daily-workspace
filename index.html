@@ -139,6 +139,28 @@
   .kc-tip{display:flex;gap:10px;align-items:flex-start;background:#fff7e6;border:1px solid #f3dca0;border-radius:14px;
     padding:12px 14px;margin:16px 0 4px;font-size:13.5px;color:#7a5a12;}
   .kc-foot{background:var(--paper);padding:16px 24px 22px;display:flex;gap:11px;flex-wrap:wrap;}
+  .kc-fav-corner{position:absolute;top:16px;right:16px;font-size:22px;line-height:1;opacity:.9;filter:drop-shadow(0 2px 4px rgba(0,0,0,.15));}
+  .btn.faved{background:linear-gradient(135deg,var(--gold),var(--gold-2));color:#5a3d0a;border:1.5px solid rgba(212,168,75,.5);box-shadow:0 4px 14px rgba(212,168,75,.3);}
+  /* 知识卡网格列表 */
+  .ls-view-head{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
+  .ls-tabs{display:flex;gap:8px;}
+  .ls-tab{background:var(--glass);border:1.5px solid var(--line);border-radius:999px;padding:8px 16px;font-size:13.5px;font-weight:800;color:var(--ink-2);transition:.14s;}
+  .ls-tab.active{background:var(--coffee);color:#fff;border-color:var(--coffee);box-shadow:0 4px 12px var(--coffee-glow);}
+  .ls-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;}
+  .ls-card{position:relative;background:var(--glass);border:1px solid var(--line);border-radius:18px;padding:16px 17px;box-shadow:var(--shadow);
+    text-align:left;width:100%;transition:transform .16s ease,box-shadow .16s ease;backdrop-filter:blur(10px);overflow:hidden;display:flex;flex-direction:column;gap:10px;}
+  .ls-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);}
+  .ls-card .lsc-cat{font-size:11px;font-weight:900;color:var(--coffee);background:#f3ead8;border-radius:999px;padding:2px 10px;align-self:flex-start;}
+  .ls-card .lsc-title{font-weight:900;font-size:15.5px;line-height:1.5;font-family:var(--serif);color:var(--ink);}
+  .ls-card .lsc-foot{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-2);}
+  .ls-card .lsc-fav{margin-left:auto;font-size:16px;background:none;border:none;cursor:pointer;line-height:1;transition:transform .12s;}
+  .ls-card .lsc-fav:hover{transform:scale(1.25);}
+  .ls-card .lsc-fav.on{color:var(--gold);}
+  .ls-card .lsc-fav.off{color:var(--ink-2);opacity:.5;}
+  .ls-empty{text-align:center;color:var(--ink-2);padding:50px 10px;font-size:15px;}
+  .ls-empty .big{font-size:48px;margin-bottom:10px;}
+  .ls-pager{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:20px;flex-wrap:wrap;}
+  .ls-pager .pg-info{font-size:13px;font-weight:800;color:var(--ink-2);background:var(--glass);border:1px solid var(--line);padding:6px 14px;border-radius:999px;}
 
   /* 面试速记 */
   .iv-bar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:16px;}
@@ -344,11 +366,19 @@
     <section class="panel" id="panel-lessons">
       <div class="section-title">☕ 每日小灶 · 今天来一张</div>
       <div id="lessonBox"></div>
-      <div class="card-grid" style="margin-top:20px;">
+      <div class="ls-view-head" id="lsViewHead" style="display:none;">
+        <div class="ls-tabs">
+          <button class="ls-tab active" id="lsTabAll" onclick="lsShowGrid('all')">📚 全部知识卡</button>
+          <button class="ls-tab" id="lsTabFav" onclick="lsShowGrid('fav')">⭐ 我的收藏</button>
+        </div>
+        <button class="btn ghost sm" style="margin-left:auto;" onclick="lsShowSingle()">← 返回单卡</button>
+      </div>
+      <div id="lsGrid"></div>
+      <div class="card-grid" style="margin-top:20px;" id="lsQuick">
         <div class="card"><div class="t">📚 全部知识卡</div><div class="m">已学 <b id="lcLearned">0</b> / <b id="lcTotal">0</b></div>
-          <button class="btn ghost sm" onclick="goQuizLib()" style="margin-top:8px;">去逛逛 →</button></div>
+          <button class="btn ghost sm" onclick="lsShowGrid('all')" style="margin-top:8px;">去逛逛 →</button></div>
         <div class="card"><div class="t">⭐ 我的收藏</div><div class="m">收藏了 <b id="lcFav">0</b> 张卡片</div>
-          <button class="btn ghost sm" onclick="goFavLib()" style="margin-top:8px;">看看收藏 →</button></div>
+          <button class="btn ghost sm" onclick="lsShowGrid('fav')" style="margin-top:8px;">看看收藏 →</button></div>
       </div>
     </section>
 
@@ -448,7 +478,7 @@ function go(tab){
   if(tab==='interview')renderIv();
   if(tab==='wrong')renderWrong();
   if(tab==='home')renderHome();
-  if(tab==='lessons')renderLesson();
+  if(tab==='lessons'){if(lsMode==='grid')renderLsGrid();else renderLesson();}
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -465,32 +495,108 @@ function renderHome(){
 }
 function markLearned(ds){const a=load(K.learned,[]);if(!a.includes(ds)){a.push(ds);save(K.learned,a);}toast('已标记今天学过 ✅');renderHome();renderLesson();}
 
-/* ---------- 每日小灶 ---------- */
-let li=0;
+/* ---------- 每日小灶（双视图：单卡 + 网格列表）---------- */
+let li=0,lsMode='single',lsFilter='all',lsPageN=1,LS_PAGE=12;
+const KF_FAVS=K.favs;
+function favIds(){
+  // 兼容旧数据：之前存的是数字索引（li），现在统一存卡 id（k001）
+  let f=load(KF_FAVS,[]);
+  const ids=f.map(v=>typeof v==='number'?(LESSONS[v]?LESSONS[v].id:String(v)):String(v));
+  return ids;
+}
+function isFav(id){return favIds().includes(id);}
+function saveFavs(ids){save(KF_FAVS,ids);}
+function toggleFav(id){
+  let ids=favIds();
+  const has=ids.includes(id);
+  ids=has?ids.filter(x=>x!==id):ids.concat(id);
+  saveFavs(ids);
+  toast(has?'已取消收藏 💔':'已收藏 ⭐');
+  renderLesson();renderLsGrid();renderHome();
+}
+function lessonById(id){return LESSONS.findIndex(c=>c.id===id);}
 function renderLesson(){
   const box=$('lessonBox');const c=LESSONS[li];
-  box.innerHTML='<div class="kc">'
+  if(!c){box.innerHTML='<div class="empty">暂无知识卡</div>';return;}
+  const fav=isFav(c.id);
+  box.innerHTML='<div class="kc" style="position:relative;">'
+    +(fav?'<span class="kc-fav-corner">⭐</span>':'')
     +'<div class="kc-head"><span class="kc-cat">'+c.cat+'</span>'
-    +'<div class="kc-title">'+c.title+'</div>'
-    +'<div class="kc-level">'+('★'.repeat(c.level||1))+' · 第 '+(li+1)+' 张</div></div>'
+    +'<div class="kc-title">'+esc(c.title)+'</div>'
+    +'<div class="kc-level">'+('★'.repeat(c.level||1))+' · 第 '+(li+1)+' / '+LESSONS.length+' 张</div></div>'
     +'<div class="kc-body"><div class="kc-story">'+c.story+'</div>'
     +(c.code?'<div class="kc-code">'+esc(c.code)+'</div>':'')
-    +(c.tip?'<div class="kc-tip">💡 '+c.tip+'</div>':'')
+    +(c.tip?'<div class="kc-tip">💡 '+esc(c.tip)+'</div>':'')
     +'</div><div class="kc-foot">'
-    +'<button class="btn sm" onclick="markLearned(\''+todayStr()+'\');nextLesson()">今天学会了 ✅</button>'
+    +'<button class="btn sm" onclick="markLearned(\''+c.id+'\');nextLesson()">今天学会了 ✅</button>'
     +'<button class="btn ghost sm" onclick="nextLesson()">换一张 ↻</button>'
-    +'<button class="btn ghost tea sm" onclick="favLesson()">收藏 ⭐</button>'
+    +(fav
+      ?'<button class="btn faved sm" onclick="toggleFav(\''+c.id+'\')">★ 已收藏</button>'
+      :'<button class="btn ghost tea sm" onclick="toggleFav(\''+c.id+'\')">☆ 收藏</button>')
+    +'<button class="btn ghost sm" onclick="lsShowGrid(\''+lsFilter+'\')">📚 逛列表</button>'
     +'</div></div>';
   $('lcLearned').textContent=load(K.learned,[]).length;
   $('lcTotal').textContent=LESSONS.length;
-  $('lcFav').textContent=load(K.favs,[]).length;
+  $('lcFav').textContent=favIds().length;
 }
 function nextLesson(){li=(li+1)%LESSONS.length;renderLesson();}
-function favLesson(){const f=load(K.favs,[]);const has=f.includes(li);
-  if(!has){f.push(li);save(K.favs,f);toast('已收藏 ⭐');}
-  else toast('这张已经收藏过啦 ⭐');renderLesson();}
-function goQuizLib(){li=0;renderLesson();toast('共 '+LESSONS.length+' 张知识卡，从第 1 张逛起 ☕');scrollLesson();}
-function goFavLib(){const f=load(K.favs,[]);if(f.length){li=f[0];renderLesson();toast('跳到收藏的第 1 张 ⭐');scrollLesson();}else toast('还没有收藏，先点卡片上的「收藏」吧');}
+function prevLesson(){li=(li-1+LESSONS.length)%LESSONS.length;renderLesson();}
+function markLearned(id){const a=load(K.learned,[]);if(!a.includes(id)){a.push(id);save(K.learned,a);}toast('已标记今天学过 ✅');renderHome();renderLesson();}
+function cleanLearned(){
+  // 旧版本 learned 存日期字符串（如 2026-08-12），新版本存卡 id（如 k001），过滤掉日期型旧数据
+  const a=load(K.learned,[]);
+  const ids=new Set(LESSONS.map(c=>c.id));
+  const clean=a.filter(v=>typeof v==='string'&&ids.has(v));
+  if(clean.length!==a.length)save(K.learned,clean);
+  return clean.length;
+}
+function lsShowGrid(filter){
+  lsFilter=filter||'all';lsMode='grid';lsPageN=1;
+  renderLsGrid();
+  scrollLesson();
+}
+function lsShowSingle(){
+  lsMode='single';renderLesson();scrollLesson();
+}
+function renderLsGrid(){
+  const head=$('lsViewHead'),grid=$('lsGrid'),quick=$('lsQuick');
+  if(!head)return;
+  // 头部/快速入口切换
+  if(lsMode==='grid'){
+    head.style.display='flex';quick.style.display='none';
+    $('lsTabAll').classList.toggle('active',lsFilter==='all');
+    $('lsTabFav').classList.toggle('active',lsFilter==='fav');
+  }else{
+    head.style.display='none';quick.style.display='grid';
+    grid.innerHTML='';return;
+  }
+  const ids=favIds();
+  let list=LESSONS.map((c,i)=>({c,i}));
+  if(lsFilter==='fav')list=list.filter(x=>ids.includes(x.c.id));
+  const total=list.length;
+  const pages=Math.max(1,Math.ceil(total/LS_PAGE));
+  if(lsPageN>pages)lsPageN=pages;
+  const slice=list.slice((lsPageN-1)*LS_PAGE,lsPageN*LS_PAGE);
+  if(!total){
+    grid.innerHTML='<div class="ls-empty"><div class="big">'+(lsFilter==='fav'?'💔':'📚')+'</div>'
+      +(lsFilter==='fav'?'还没有收藏的卡片，去卡片上点「☆ 收藏」吧':'暂无知识卡')+'</div>';
+    return;
+  }
+  grid.innerHTML='<div class="ls-grid">'+slice.map(x=>{
+    const c=x.c;const f=ids.includes(c.id);
+    return '<div class="ls-card" onclick="lsOpen('+x.i+')">'
+      +'<span class="lsc-cat">'+esc(c.cat)+'</span>'
+      +'<div class="lsc-title">'+esc(c.title)+'</div>'
+      +'<div class="lsc-foot"><span>'+('★'.repeat(c.level||1))+'</span>'
+      +'<button class="lsc-fav '+(f?'on':'off')+'" onclick="event.stopPropagation();toggleFav(\''+c.id+'\')">'+(f?'★':'☆')+'</button></div>'
+      +'</div>';}).join('')+'</div>'
+    +'<div class="ls-pager">'
+    +'<button class="btn ghost sm" '+(lsPageN>1?'onclick="lsPage(-1)"':'disabled')+'>← 上一页</button>'
+    +'<span class="pg-info">第 '+lsPageN+' / '+pages+' 页 · 共 '+total+' 张</span>'
+    +'<button class="btn ghost sm" '+(lsPageN<pages?'onclick="lsPage(1)"':'disabled')+'>下一页 →</button></div>';
+}
+function lsOpen(idx){li=idx;lsMode='single';renderLesson();scrollLesson();}
+function lsPage(d){lsPageN+=d;renderLsGrid();scrollLesson();}
 function scrollLesson(){const el=$('lessonBox');if(el&&el.scrollIntoView)el.scrollIntoView({behavior:'smooth',block:'start'});}
 
 /* ---------- 题库闯关 ---------- */
@@ -792,6 +898,7 @@ async function initApp(){
   ['lessonBox','quizModGrid','ivList','wrongList'].forEach(id=>{const el=$(id);if(el&&!el.innerHTML)el.innerHTML=LOAD_HTML;});
   const ok=await loadData();
   if(!ok){toast('数据加载失败，请检查网络后刷新');if($('syncTxt'))$('syncTxt').textContent='加载失败，刷新重试';}
+  if(typeof cleanLearned==='function')cleanLearned();  // 旧版日期数据清洗
   renderLesson();renderHome();renderQuizHome();renderWrong();renderIv();
 }
 initApp();
