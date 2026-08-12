@@ -154,8 +154,11 @@
   .iv-prog .bar{flex:1;min-width:140px;height:9px;background:#f0e6d3;border-radius:999px;overflow:hidden;}
   .iv-prog .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--coffee),var(--gold));border-radius:999px;transition:width .4s ease;}
   .iv-grid{display:grid;grid-template-columns:1fr;gap:12px;}
-  .iv-card{background:var(--glass);border:1px solid var(--line);border-radius:18px;padding:17px 19px;box-shadow:var(--shadow);backdrop-filter:blur(10px);transition:transform .16s ease;}
+  .iv-card{position:relative;background:var(--glass);border:1px solid var(--line);border-radius:18px;padding:17px 19px;box-shadow:var(--shadow);backdrop-filter:blur(10px);transition:transform .16s ease;overflow:hidden;}
   .iv-card:hover{transform:translateY(-2px);}
+  .iv-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:transparent;}
+  .iv-card.st-y::before{background:var(--green);}
+  .iv-card.st-r::before{background:var(--red);}
   .iv-q{font-size:16px;font-weight:900;line-height:1.65;cursor:pointer;display:flex;gap:12px;align-items:flex-start;font-family:var(--serif);color:var(--ink);}
   .iv-q .me{font-size:24px;flex:none;margin-top:2px;}
   .iv-q .arr{margin-left:auto;font-size:13px;color:var(--ink-2);transition:transform .2s;}
@@ -175,6 +178,34 @@
   .iv-state{margin-left:auto;font-size:12.5px;font-weight:900;display:inline-flex;align-items:center;gap:5px;}
   .iv-state.mastered{color:var(--green);}
   .iv-state.review{color:var(--red);}
+  /* 分页 */
+  .iv-pager{display:flex;align-items:center;justify-content:center;gap:14px;margin:22px 0 4px;flex-wrap:wrap;}
+  .iv-pager .pg-btn{min-width:96px;min-height:42px;}
+  .iv-pager .pg-info{font-size:13.5px;font-weight:800;color:var(--ink-2);background:var(--glass);border:1px solid var(--line);padding:7px 16px;border-radius:999px;}
+  /* 抽考闪卡 */
+  .iv-exam-wrap{display:none;}
+  .iv-exam-wrap.on{display:block;}
+  .iv-browse.on{display:none;}
+  .iv-exam-head{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
+  .iv-exam-card{background:var(--paper);border:1px solid var(--line);border-radius:24px;padding:30px 28px 26px;box-shadow:var(--shadow);position:relative;overflow:hidden;}
+  .iv-exam-card::before{content:"";position:absolute;right:-40px;top:-40px;width:180px;height:180px;background:radial-gradient(circle,rgba(212,168,75,.18),transparent 65%);pointer-events:none;}
+  .iv-exam-q{font-size:24px;font-weight:900;line-height:1.65;font-family:var(--serif);color:var(--ink);margin:16px 0 10px;}
+  .iv-exam-meta{display:flex;gap:9px;align-items:center;flex-wrap:wrap;font-size:12.5px;color:var(--ink-2);}
+  .iv-exam-a{max-height:0;overflow:hidden;transition:max-height .45s cubic-bezier(.22,1,.36,1),opacity .3s;opacity:0;border-top:1.6px dashed var(--line);margin-top:0;padding-top:0;}
+  .iv-exam-a.show{max-height:1200px;opacity:1;margin-top:20px;padding-top:16px;}
+  .iv-exam-a .fun{font-size:15px;line-height:1.95;color:var(--ink);}
+  .iv-exam-a .fun b{color:var(--coffee);}
+  .iv-exam-a .fun code{background:#f3ead8;border-radius:7px;padding:2px 7px;font-size:12.5px;font-family:Consolas,Menlo,monospace;color:#934f15;}
+  .iv-exam-a .orig{margin-top:12px;font-size:13px;color:var(--ink-2);border-left:3px solid var(--line);padding-left:12px;max-height:160px;overflow:auto;line-height:1.7;}
+  .iv-exam-actions{display:flex;gap:11px;margin-top:22px;flex-wrap:wrap;align-items:center;}
+  .iv-exam-hint{font-size:13px;color:var(--ink-2);background:var(--glass);border:1px dashed var(--line);border-radius:12px;padding:10px 14px;line-height:1.7;}
+  .iv-exam-count{font-size:13.5px;font-weight:800;color:var(--ink-2);background:var(--glass);border:1px solid var(--line);padding:7px 14px;border-radius:999px;margin-left:auto;}
+  .iv-exam-done{text-align:center;padding:40px 10px;}
+  .iv-exam-done .big{font-size:56px;margin-bottom:10px;}
+  .iv-exam-done h3{margin:0 0 8px;font-family:var(--serif);font-size:22px;color:var(--ink);}
+  .iv-exam-done p{margin:0 0 20px;color:var(--ink-2);font-size:14.5px;}
+  .iv-exam-bar{flex:1;min-width:120px;height:9px;background:#f0e6d3;border-radius:999px;overflow:hidden;}
+  .iv-exam-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--green),var(--accent));border-radius:999px;transition:width .35s ease;}
 
   /* 答题 */
   .quiz-head{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
@@ -356,17 +387,35 @@
     <!-- 面试速记 -->
     <section class="panel" id="panel-interview">
       <div class="section-title">🃏 面试速记 · 大厂真题风趣版</div>
-      <div class="sub">点题目展开风趣答案；「记住了」变绿入掌握，「再复习」标红提醒。搜索/筛选模块 👇</div>
+      <div class="sub">浏览模式点题看答案；「抽考模式」像真面试一样先默答再看答案。搜索/筛选模块 👇</div>
       <div class="iv-bar">
         <div class="iv-search"><span>🔍</span><input id="ivSearch" placeholder="搜索关键词，如 HashMap / 线程池 / JVM…"/></div>
+        <button class="btn gold sm" onclick="ivStartExam()">🎯 抽考模式</button>
         <button class="btn ghost sm" id="ivFilterReview" onclick="toggleIvReview()">📕 只看待复习</button>
       </div>
       <div class="chip-row" id="ivChips"></div>
-      <div class="iv-prog">
-        <span id="ivProgTxt">已掌握 0 / 0</span>
-        <span class="bar"><i id="ivProgBar" style="width:0%"></i></span>
+      <!-- 浏览模式 -->
+      <div id="ivBrowse">
+        <div class="iv-prog">
+          <span id="ivProgTxt">已掌握 0 / 0</span>
+          <span class="bar"><i id="ivProgBar" style="width:0%"></i></span>
+        </div>
+        <div class="iv-grid" id="ivList"></div>
+        <div class="iv-pager">
+          <button class="btn ghost sm pg-btn" id="ivPrev" onclick="ivPage(-1)">← 上一页</button>
+          <span class="pg-info" id="ivPageInfo"></span>
+          <button class="btn ghost sm pg-btn" id="ivNext" onclick="ivPage(1)">下一页 →</button>
+        </div>
       </div>
-      <div class="iv-grid" id="ivList"></div>
+      <!-- 抽考模式 -->
+      <div class="iv-exam-wrap" id="ivExam">
+        <div class="iv-exam-head">
+          <button class="btn ghost sm" onclick="ivExitExam()">← 返回浏览</button>
+          <span class="iv-exam-count" id="examCount">0 / 0</span>
+          <span class="iv-exam-bar"><i id="examBar" style="width:0%"></i></span>
+        </div>
+        <div id="examBody"></div>
+      </div>
     </section>
 
     <!-- 错题本 -->
@@ -560,6 +609,7 @@ function masterWrong(id){const w=load(K.wrong,{});delete w[id];save(K.wrong,w);t
 /* ---------- 面试速记 ---------- */
 let ivFilter={mod:'all',search:'',reviewOnly:false};
 const IVMODS=[['all','全部','🌐']];
+let ivPageN=1,IV_PAGE=8;
 function buildIvMods(){
   const m={};IV.forEach(x=>m[x.module]=(m[x.module]||0)+1);
   const order=['basic','oop','string','collection','exception','reflect','concurrency','jvm','modern','io','db','redis','net','mq','framework','arch','design'];
@@ -568,6 +618,14 @@ function buildIvMods(){
 }
 function modName(k){const map={'basic':'Java 基础','oop':'面向对象','string':'字符串','collection':'集合','exception':'异常','reflect':'泛型·反射·注解','concurrency':'并发','jvm':'JVM','modern':'新特性','io':'IO','db':'MySQL','redis':'Redis','net':'网络','mq':'消息队列','framework':'Spring','arch':'系统设计','design':'设计模式'};return map[k]||k;}
 function countIv(mod){if(mod==='all')return IV.length;return IV.filter(x=>x.module===mod).length;}
+function ivFiltered(){
+  const iv=load(K.iv,{});const kw=(ivFilter.search||'').toLowerCase();
+  return IV.filter(x=>{
+    if(ivFilter.mod!=='all'&&x.module!==ivFilter.mod)return false;
+    if(ivFilter.reviewOnly&&iv[x.id]!=='r')return false;
+    if(kw&&!(x.q.toLowerCase().includes(kw)||(x.a_fun||'').toLowerCase().includes(kw)))return false;
+    return true;});
+}
 function renderIv(){
   buildIvMods();
   $('ivChips').innerHTML=IVMODS.map(m=>'<button class="chip'+(ivFilter.mod===m[0]?' active':'')+'" onclick="setIvMod(\''+m[0]+'\')">'+m[2]+' '+m[1]+' ('+countIv(m[0])+')</button>').join('');
@@ -575,28 +633,33 @@ function renderIv(){
   const mastered=Object.values(iv).filter(s=>s==='y').length;
   $('ivProgTxt').textContent='已掌握 '+mastered+' / '+IV.length;
   $('ivProgBar').style.width=(IV.length?mastered/IV.length*100:0)+'%';
-  const kw=(ivFilter.search||'').toLowerCase();
-  let list=IV.filter(x=>{
-    if(ivFilter.mod!=='all'&&x.module!==ivFilter.mod)return false;
-    if(ivFilter.reviewOnly&&iv[x.id]!=='r')return false;
-    if(kw&&!(x.q.toLowerCase().includes(kw)||(x.a_fun||'').toLowerCase().includes(kw)))return false;
-    return true;});
+  const list=ivFiltered();
+  const total=list.length;
+  const pages=Math.max(1,Math.ceil(total/IV_PAGE));
+  if(ivPageN>pages)ivPageN=pages;
+  if(ivPageN<1)ivPageN=1;
+  const slice=list.slice((ivPageN-1)*IV_PAGE,ivPageN*IV_PAGE);
   const box=$('ivList');
-  if(!list.length){box.innerHTML='<div class="empty"><div class="big">🔍</div>没有匹配的题</div>';return;}
-  box.innerHTML=list.map(x=>{
+  if(!total){box.innerHTML='<div class="empty"><div class="big">🔍</div>没有匹配的题</div>';$('ivPageInfo').textContent='0 / 0';$('ivPrev').style.visibility='hidden';$('ivNext').style.visibility='hidden';$('nbReview').textContent=IV.length;return;}
+  box.innerHTML=slice.map(x=>{
     const st=iv[x.id];
-    const state=st==='y'?'<span class="iv-state mastered">✅ 已掌握</span>':(st==='r'?'<span class="iv-state review">🔁 待复习</span>':'');
+    const cls=st==='y'?' st-y':(st==='r'?' st-r':'');
+    const state=st==='y'?'<span class="iv-state mastered">✅ 已掌握</span>':(st==='r'?'<span class="iv-state review">🔁 待复习</span>':'<span class="iv-state" style="color:var(--ink-2)">⚪ 未开始</span>');
     const fun=x.a_fun?('<div class="fun">'+x.a_fun+'</div>'):'';
     const orig=x.a?'<div class="orig">📝 '+esc(x.a.length>500?x.a.slice(0,500)+'…':x.a)+'</div>':'';
-    return '<div class="iv-card" id="ic-'+x.id+'"><div class="iv-q" onclick="toggleIvA(\''+x.id+'\')">'
+    return '<div class="iv-card'+cls+'" id="ic-'+x.id+'"><div class="iv-q" onclick="toggleIvA(\''+x.id+'\')">'
     +'<span class="me">'+x.me+'</span><span>'+esc(x.q)+'</span>'+state+'<span class="arr">▼</span></div>'
     +'<div class="iv-meta"><span class="iv-tag">'+esc(x.mn||x.module)+'</span><span class="iv-src">'+(x.src==='basic'?'基础版':'热门200')+'</span></div>'
     +'<div class="iv-a"><div class="iv-a-inner">'+fun+(x.a_fun?orig:'')+'</div>'
     +'<div class="iv-actions"><button class="btn tea sm" onclick="ivSet(\''+x.id+'\',\'y\')">记住了 ✅</button>'
     +'<button class="btn ghost sm" onclick="ivSet(\''+x.id+'\',\'r\')">再复习 🔁</button></div></div></div>';}).join('');
+  $('ivPageInfo').textContent='第 '+ivPageN+' / '+pages+' 页 · 共 '+total+' 题';
+  $('ivPrev').style.visibility=ivPageN>1?'visible':'hidden';
+  $('ivNext').style.visibility=ivPageN<pages?'visible':'hidden';
   $('nbReview').textContent=IV.length;
 }
-function setIvMod(m){ivFilter.mod=m;renderIv();}
+function ivPage(d){ivPageN+=d;renderIv();$('ivList').scrollIntoView({behavior:'smooth',block:'start'});}
+function setIvMod(m){ivFilter.mod=m;ivPageN=1;renderIv();}
 function toggleIvA(id){const card=$('ic-'+id);card.classList.toggle('open');}
 function ivSet(id,st){
   const iv=load(K.iv,{});iv[id]=st;save(K.iv,iv);
@@ -605,7 +668,64 @@ function ivSet(id,st){
   renderIv();renderHome();
 }
 function toggleIvReview(){ivFilter.reviewOnly=!ivFilter.reviewOnly;$('ivFilterReview').textContent=ivFilter.reviewOnly?'🌐 全部':'📕 只看待复习';renderIv();}
-$('ivSearch').addEventListener('input',e=>{ivFilter.search=e.target.value;renderIv();});
+$('ivSearch').addEventListener('input',e=>{ivFilter.search=e.target.value;ivPageN=1;renderIv();});
+
+/* ---------- 面试抽考（闪卡） ---------- */
+let examList=[],examIdx=0,examKnown=0;
+function ivStartExam(){
+  const list=ivFiltered();
+  if(!list.length){toast('当前范围没有题，换个筛选吧');return;}
+  // 优先抽"未掌握/待复习"的，随机打乱，最多 20 题
+  const iv=load(K.iv,{});
+  const todo=[...list].sort((a,b)=>((iv[a.id]==='y')?1:0)-((iv[b.id]==='y')?1:0));
+  examList=todo.slice(0,Math.min(20,todo.length)).sort(()=>Math.random()-.5);
+  examIdx=0;examKnown=0;
+  $('ivBrowse').style.display='none';$('ivExam').classList.add('on');
+  ivRenderExam();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function ivExitExam(){$('ivExam').classList.remove('on');$('ivBrowse').style.display='';renderIv();}
+function ivRenderExam(){
+  const body=$('examBody');
+  const total=examList.length;
+  $('examCount').textContent=(examIdx+1)+' / '+total;
+  $('examBar').style.width=(examIdx/total*100)+'%';
+  if(examIdx>=total){
+    body.innerHTML='<div class="iv-exam-done"><div class="big">🎉</div><h3>本轮抽考完成！</h3>'
+      +'<p>共 '+total+' 题 · 你标记记住了 '+examKnown+' 题</p>'
+      +'<button class="btn" onclick="ivStartExam()">再抽一轮 🎯</button> '
+      +'<button class="btn ghost" onclick="ivExitExam()">返回浏览</button></div>';
+    return;
+  }
+  const x=examList[examIdx];
+  const fun=x.a_fun?('<div class="fun">'+x.a_fun+'</div>'):'';
+  const orig=x.a?'<div class="orig">📝 '+esc(x.a.length>500?x.a.slice(0,500)+'…':x.a)+'</div>':'';
+  body.innerHTML='<div class="iv-exam-card">'
+    +'<div class="iv-exam-meta"><span class="iv-tag">'+esc(x.mn||x.module)+'</span>'
+    +'<span class="iv-src">'+(x.src==='basic'?'基础版':'热门200')+'</span></div>'
+    +'<div class="iv-exam-q">'+esc(x.q)+'</div>'
+    +'<div class="iv-exam-hint">🤔 先在心里默答一遍，想好了再点「看答案」对照</div>'
+    +'<button class="btn ghost sm" style="margin-top:14px;" onclick="ivExamFlip()">👁 看答案</button>'
+    +'<div class="iv-exam-a" id="examA">'+fun+(x.a_fun?orig:'')+'</div>'
+    +'<div class="iv-exam-actions" id="examActs" style="display:none;">'
+    +'<button class="btn tea" onclick="ivExamMark(\'y\')">✅ 记住了</button>'
+    +'<button class="btn ghost" onclick="ivExamMark(\'r\')">🔁 再复习</button>'
+    +'<button class="btn ghost" onclick="ivExamSkip()">⏭ 跳过</button></div></div>';
+}
+function ivExamFlip(){
+  const a=$('examA');if(!a)return;
+  a.classList.add('show');
+  $('examActs').style.display='flex';
+  a.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function ivExamMark(st){
+  const x=examList[examIdx];
+  const iv=load(K.iv,{});iv[x.id]=st;save(K.iv,iv);
+  if(st==='y')examKnown++;
+  examIdx++;
+  ivRenderExam();renderHome();
+}
+function ivExamSkip(){examIdx++;ivRenderExam();}
 
 /* ---------- 备份 ---------- */
 function exportData(){
